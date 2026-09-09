@@ -37,6 +37,8 @@
     "code-editor": "assets/icons/links98/code-editor.png",
     editor: "assets/icons/links98/editor.png",
     folder: "assets/icons/folder.png",
+    rugsweeper: "assets/icons/links98/rugsweeper.png",
+    winamp: "assets/icons/links98/winamp.png",
   });
 
   const appIconRegistry = Object.freeze({
@@ -50,6 +52,9 @@
     linksonline: iconRegistry["links-online"],
     notepad: iconRegistry.notepad,
     editor: iconRegistry.editor,
+    rugsweeper: iconRegistry.rugsweeper,
+    winamp: iconRegistry.winamp,
+    media: iconRegistry.winamp,
   });
 
   const dialogAssets = Object.freeze({

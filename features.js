@@ -1901,6 +1901,13 @@ Please clear the cat before continuing print jobs.
     APPS.arcade.render = () => {
       const base = oldArcadeRender();
       const extraCards = `
+        <div class="arcade-game-card" data-launch-game="rugsweeper">
+          <img class="arcade-card-icon" src="${appIcon("rugsweeper", icon("links"))}" alt="RUGSWEEPER.EXE">
+          <div class="arcade-card-title">RUGSWEEPER.EXE</div>
+          <div class="arcade-card-desc">Windows 98 Minesweeper Crypto Edition. Sweep the grid, flag the rugs, and HODL your position!</div>
+          <div class="arcade-card-highscore">MINESWEEPER CRYPTO</div>
+          <button class="win-button arcade-play-btn" type="button">PLAY</button>
+        </div>
         <div class="arcade-game-card" data-launch-game="solitaire">
           <img class="arcade-card-icon" src="${appIcon("solitaire")}" alt="LINKS Solitaire">
           <div class="arcade-card-title">LINKS Solitaire</div>
@@ -1923,6 +1930,9 @@ Please clear the cat before continuing print jobs.
     APPS.arcade.mount = (windowElement) => {
       oldArcadeMount?.(windowElement);
       windowElement.addEventListener("click", (e) => {
+        if (e.target.closest("[data-launch-game='rugsweeper']")) {
+          wm.open("rugsweeper");
+        }
         if (e.target.closest("[data-launch-game='solitaire']")) {
           wm.open("solitaire");
         }
@@ -1954,25 +1964,541 @@ Please clear the cat before continuing print jobs.
     };
   }
 
-  // Add File > Print... support to Lore
-  if (APPS.lore) {
-    const oldLoreMount = APPS.lore.mount;
-    APPS.lore.mount = (windowElement) => {
-      oldLoreMount?.(windowElement);
-      const nav = $(".lore-nav", windowElement);
-      if (nav && !$("[data-lore='print']", nav)) {
-        nav.insertAdjacentHTML("beforeend", `<button class="win-button" type="button" data-lore="print">Print Chapter</button>`);
+  // =========================================================================
+  // FEATURE 7: RUGSWEEPER.EXE (Minesweeper Crypto Edition)
+  // =========================================================================
+  APPS.rugsweeper = {
+    title: "RUGSWEEPER.EXE",
+    icon: appIcon("rugsweeper", icon("links")),
+    width: 330,
+    height: 390,
+    menu: false,
+    render: () => {
+      const best = localStorage.getItem("links98:rugsweeper_best") || "--";
+      return `
+        <div class="rugsweeper-container" data-rug-root>
+          <div class="rugsweeper-window-body">
+            <div class="rug-header-frame">
+              <div class="rug-digital-counter" data-rug-mines>010</div>
+              <button class="rug-face-btn" type="button" data-rug-reset title="Reset Game">
+                <img src="assets/cats/reactions/confident.png" alt="Reset" data-rug-face>
+              </button>
+              <div class="rug-digital-counter" data-rug-timer>000</div>
+            </div>
+            <div class="rug-grid-frame">
+              <div class="rug-board" data-rug-board></div>
+            </div>
+          </div>
+          <div class="rugsweeper-statusbar">
+            <span>Best Time: <b data-rug-best>${best}s</b></span>
+            <span>9x9 Grid · 10 Rugs</span>
+          </div>
+        </div>
+      `;
+    },
+    mount: (windowElement) => {
+      const rows = 9, cols = 9, totalMines = 10;
+      let grid = [];
+      let minesPlaced = false;
+      let gameOver = false;
+      let flagsCount = 0;
+      let timer = 0;
+      let timerInterval = null;
+
+      const boardEl = $("[data-rug-board]", windowElement);
+      const minesEl = $("[data-rug-mines]", windowElement);
+      const timerEl = $("[data-rug-timer]", windowElement);
+      const faceEl = $("[data-rug-face]", windowElement);
+      const bestEl = $("[data-rug-best]", windowElement);
+
+      function initGame() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timer = 0;
+        flagsCount = 0;
+        minesPlaced = false;
+        gameOver = false;
+        faceEl.src = "assets/cats/reactions/confident.png";
+        minesEl.textContent = String(totalMines).padStart(3, "0");
+        timerEl.textContent = "000";
+
+        grid = Array.from({ length: rows }, () =>
+          Array.from({ length: cols }, () => ({
+            mine: false,
+            revealed: false,
+            flagged: false,
+            count: 0
+          }))
+        );
+
+        renderBoard();
       }
+
+      function startTimer() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => {
+          timer = Math.min(999, timer + 1);
+          timerEl.textContent = String(timer).padStart(3, "0");
+        }, 1000);
+      }
+
+      function placeMines(excludeR, excludeC) {
+        let placed = 0;
+        while (placed < totalMines) {
+          const r = Math.floor(Math.random() * rows);
+          const c = Math.floor(Math.random() * cols);
+          if ((r === excludeR && c === excludeC) || grid[r][c].mine) continue;
+          grid[r][c].mine = true;
+          placed++;
+        }
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (grid[r][c].mine) continue;
+            let count = 0;
+            for (let dr = -1; dr <= 1; dr++) {
+              for (let dc = -1; dc <= 1; dc++) {
+                const nr = r + dr, nc = c + dc;
+                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc].mine) {
+                  count++;
+                }
+              }
+            }
+            grid[r][c].count = count;
+          }
+        }
+        minesPlaced = true;
+      }
+
+      function renderBoard() {
+        boardEl.innerHTML = "";
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const cell = grid[r][c];
+            const btn = document.createElement("button");
+            btn.className = "mine-cell";
+            btn.dataset.r = r;
+            btn.dataset.c = c;
+            btn.type = "button";
+
+            if (cell.revealed) {
+              btn.classList.add("revealed");
+              if (cell.mine) {
+                btn.innerHTML = "💣";
+              } else if (cell.count > 0) {
+                btn.textContent = cell.count;
+                btn.dataset.num = cell.count;
+              }
+            } else if (cell.flagged) {
+              btn.classList.add("flagged");
+              btn.innerHTML = "🛡";
+            }
+
+            boardEl.appendChild(btn);
+          }
+        }
+      }
+
+      function reveal(r, c) {
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return;
+        const cell = grid[r][c];
+        if (cell.revealed || cell.flagged) return;
+
+        if (!minesPlaced) {
+          placeMines(r, c);
+          startTimer();
+        }
+
+        cell.revealed = true;
+
+        if (cell.mine) {
+          gameOver = true;
+          clearInterval(timerInterval);
+          faceEl.src = "assets/cats/reactions/annoyed.png";
+          beep("error");
+          revealAllMines(r, c);
+          announce("Rug pulled! Game over.");
+          return;
+        }
+
+        beep("click");
+
+        if (cell.count === 0) {
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              if (dr !== 0 || dc !== 0) reveal(r + dr, c + dc);
+            }
+          }
+        }
+
+        checkWin();
+        renderBoard();
+      }
+
+      function toggleFlag(r, c) {
+        if (gameOver) return;
+        const cell = grid[r][c];
+        if (cell.revealed) return;
+
+        if (!cell.flagged && flagsCount >= totalMines) return;
+
+        cell.flagged = !cell.flagged;
+        flagsCount += cell.flagged ? 1 : -1;
+        minesEl.textContent = String(Math.max(0, totalMines - flagsCount)).padStart(3, "0");
+        beep("click");
+        renderBoard();
+      }
+
+      function revealAllMines(hitR, hitC) {
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (grid[r][c].mine) {
+              grid[r][c].revealed = true;
+            }
+          }
+        }
+        renderBoard();
+        const hitBtn = boardEl.querySelector(`[data-r="${hitR}"][data-c="${hitC}"]`);
+        if (hitBtn) hitBtn.classList.add("exploded");
+      }
+
+      function checkWin() {
+        let unrevealedSafe = 0;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (!grid[r][c].mine && !grid[r][c].revealed) {
+              unrevealedSafe++;
+            }
+          }
+        }
+
+        if (unrevealedSafe === 0) {
+          gameOver = true;
+          clearInterval(timerInterval);
+          faceEl.src = "assets/cats/reactions/celebrating.png";
+          playVictorySound();
+          announce(`RUGSWEEPER VICTORY in ${timer} seconds!`);
+
+          const currentBest = parseInt(localStorage.getItem("links98:rugsweeper_best") || "999", 10);
+          if (timer < currentBest) {
+            localStorage.setItem("links98:rugsweeper_best", String(timer));
+            if (bestEl) bestEl.textContent = `${timer}s`;
+          }
+        }
+      }
+
+      boardEl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".mine-cell");
+        if (!btn || gameOver) return;
+        const r = parseInt(btn.dataset.r, 10);
+        const c = parseInt(btn.dataset.c, 10);
+        reveal(r, c);
+      });
+
+      boardEl.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const btn = e.target.closest(".mine-cell");
+        if (!btn || gameOver) return;
+        const r = parseInt(btn.dataset.r, 10);
+        const c = parseInt(btn.dataset.c, 10);
+        toggleFlag(r, c);
+      });
+
+      let touchTimer = null;
+      boardEl.addEventListener("touchstart", (e) => {
+        const btn = e.target.closest(".mine-cell");
+        if (!btn || gameOver) return;
+        const r = parseInt(btn.dataset.r, 10);
+        const c = parseInt(btn.dataset.c, 10);
+        touchTimer = setTimeout(() => {
+          toggleFlag(r, c);
+          touchTimer = null;
+        }, 400);
+      }, { passive: true });
+
+      boardEl.addEventListener("touchend", () => {
+        clearTimeout(touchTimer);
+      }, { passive: true });
+
+      windowElement.querySelector("[data-rug-reset]")?.addEventListener("click", initGame);
+
+      initGame();
+    },
+    unmount: (windowElement) => {}
+  };
+
+  // =========================================================================
+  // FEATURE 8: WINAMP.EXE (CatAMP 2.98 - 90s Chiptune Synth Player)
+  // =========================================================================
+  APPS.winamp = {
+    title: "CatAMP 2.98 - LINKS Media Player",
+    icon: appIcon("winamp", icon("links")),
+    width: 380,
+    height: 270,
+    menu: false,
+    render: () => `
+      <div class="winamp-chassis" data-winamp-root>
+        <div class="winamp-top-display">
+          <div class="winamp-vis-canvas-wrap">
+            <canvas class="winamp-vis-canvas" width="76" height="38"></canvas>
+          </div>
+          <div class="winamp-lcd-panel">
+            <div class="winamp-lcd-header">
+              <span class="winamp-mono-tag">STEREO</span>
+              <span class="winamp-kbps-tag">128 KBPS</span>
+              <span class="winamp-khz-tag">44 KHZ</span>
+            </div>
+            <div class="winamp-marquee-wrap">
+              <div class="winamp-marquee-text" data-winamp-title>1. LINKS CAT - DIAL-UP ANTHEM (1998) ***</div>
+            </div>
+            <div class="winamp-time-row">
+              <span class="winamp-time-display" data-winamp-time>00:00</span>
+              <span class="winamp-status-badge" data-winamp-status>STOPPED</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="winamp-sliders-strip">
+          <label class="winamp-slider-wrap">
+            <span>VOL</span>
+            <input type="range" class="winamp-range" data-winamp-vol min="0" max="100" value="75">
+          </label>
+          <label class="winamp-slider-wrap">
+            <span>BAL</span>
+            <input type="range" class="winamp-range" data-winamp-pan min="-50" max="50" value="0">
+          </label>
+        </div>
+
+        <div class="winamp-controls-row">
+          <button class="winamp-btn" type="button" data-winamp-cmd="prev" title="Previous Track">|◀◀</button>
+          <button class="winamp-btn" type="button" data-winamp-cmd="play" title="Play">▶</button>
+          <button class="winamp-btn" type="button" data-winamp-cmd="pause" title="Pause">❚❚</button>
+          <button class="winamp-btn" type="button" data-winamp-cmd="stop" title="Stop">■</button>
+          <button class="winamp-btn" type="button" data-winamp-cmd="next" title="Next Track">▶▶|</button>
+          <button class="winamp-btn" type="button" data-winamp-cmd="eject" title="Toggle Playlist">⏏</button>
+        </div>
+
+        <div class="winamp-playlist-box" data-winamp-playlist>
+          <div class="winamp-pl-entry is-active" data-track-idx="0">1. Links Cat - Dial-Up Anthem (1998)</div>
+          <div class="winamp-pl-entry" data-track-idx="1">2. Degen Hills - 56k Chiptune Dreams</div>
+          <div class="winamp-pl-entry" data-track-idx="2">3. Green Candle Symphony in C Minor</div>
+          <div class="winamp-pl-entry" data-track-idx="3">4. Moon Mission (8-Bit Cat Beat)</div>
+        </div>
+      </div>
+    `,
+    mount: (windowElement) => {
+      const TRACKS = [
+        { title: "1. Links Cat - Dial-Up Anthem (1998)", bpm: 130, notes: [261.63, 329.63, 392.00, 523.25, 440.00, 392.00, 329.63, 293.66, 261.63, 392.00, 523.25, 659.25, 587.33, 523.25, 392.00, 329.63], bass: [130.81, 130.81, 164.81, 164.81, 110.00, 110.00, 146.83, 146.83] },
+        { title: "2. Degen Hills - 56k Chiptune Dreams", bpm: 120, notes: [329.63, 392.00, 493.88, 587.33, 493.88, 392.00, 329.63, 246.94, 293.66, 369.99, 440.00, 587.33, 440.00, 369.99, 293.66, 220.00], bass: [164.81, 164.81, 123.47, 123.47, 146.83, 146.83, 110.00, 110.00] },
+        { title: "3. Green Candle Symphony in C Minor", bpm: 138, notes: [261.63, 311.13, 392.00, 466.16, 523.25, 466.16, 392.00, 311.13, 233.08, 293.66, 349.23, 466.16, 349.23, 293.66, 233.08, 196.00], bass: [130.81, 130.81, 116.54, 116.54, 146.83, 146.83, 98.00, 98.00] },
+        { title: "4. Moon Mission (8-Bit Cat Beat)", bpm: 125, notes: [392.00, 493.88, 587.33, 783.99, 659.25, 587.33, 493.88, 392.00, 349.23, 440.00, 523.25, 698.46, 587.33, 523.25, 440.00, 349.23], bass: [98.00, 98.00, 130.81, 130.81, 87.31, 87.31, 116.54, 116.54] }
+      ];
+
+      let currentTrack = 0;
+      let isPlaying = false;
+      let audioCtx = null;
+      let masterGain = null;
+      let analyser = null;
+      let playTimer = null;
+      let visAnimFrame = null;
+      let trackTimeSeconds = 0;
+      let noteStep = 0;
+
+      const titleEl = $("[data-winamp-title]", windowElement);
+      const timeEl = $("[data-winamp-time]", windowElement);
+      const statusEl = $("[data-winamp-status]", windowElement);
+      const volSlider = $("[data-winamp-vol]", windowElement);
+      const canvas = $(".winamp-vis-canvas", windowElement);
+      const ctx = canvas?.getContext("2d");
+
+      function initAudio() {
+        if (audioCtx) return;
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioClass();
+        masterGain = audioCtx.createGain();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        masterGain.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        setVolume(volSlider.value);
+      }
+
+      function setVolume(val) {
+        if (masterGain && audioCtx) {
+          masterGain.gain.setValueAtTime((val / 100) * 0.08, audioCtx.currentTime);
+        }
+      }
+
+      function drawVisualizer() {
+        if (!canvas || !analyser) return;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(dataArray);
+
+        ctx.fillStyle = "#000a00";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barCount = 14;
+        const barWidth = 4;
+        const gap = 1;
+
+        for (let i = 0; i < barCount; i++) {
+          const rawVal = dataArray[i * 2] || 0;
+          const val = isPlaying ? Math.max(3, (rawVal / 255) * canvas.height) : 2;
+          const x = i * (barWidth + gap) + 3;
+
+          ctx.fillStyle = val > 26 ? "#ff2222" : val > 16 ? "#ffff00" : "#00ff44";
+          ctx.fillRect(x, canvas.height - val, barWidth, val);
+        }
+
+        if (isPlaying) {
+          visAnimFrame = requestAnimationFrame(drawVisualizer);
+        }
+      }
+
+      function playNote() {
+        if (!isPlaying || !audioCtx) return;
+        const track = TRACKS[currentTrack];
+        const freq = track.notes[noteStep % track.notes.length];
+        const bassFreq = track.bass[(noteStep >> 1) % track.bass.length];
+
+        const t = audioCtx.currentTime;
+        const dur = (60 / track.bpm) * 0.45;
+
+        // Lead
+        const osc1 = audioCtx.createOscillator();
+        const g1 = audioCtx.createGain();
+        osc1.type = "square";
+        osc1.frequency.setValueAtTime(freq, t);
+        g1.gain.setValueAtTime(0.04, t);
+        g1.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        osc1.connect(g1).connect(masterGain);
+        osc1.start(t);
+        osc1.stop(t + dur);
+
+        // Bass
+        const osc2 = audioCtx.createOscillator();
+        const g2 = audioCtx.createGain();
+        osc2.type = "triangle";
+        osc2.frequency.setValueAtTime(bassFreq, t);
+        g2.gain.setValueAtTime(0.06, t);
+        g2.gain.exponentialRampToValueAtTime(0.001, t + dur * 1.2);
+        osc2.connect(g2).connect(masterGain);
+        osc2.start(t);
+        osc2.stop(t + dur * 1.2);
+
+        noteStep++;
+      }
+
+      function play() {
+        initAudio();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        isPlaying = true;
+        statusEl.textContent = "PLAYING";
+        statusEl.style.color = "#00ff66";
+        statusEl.style.background = "#003300";
+        titleEl.textContent = `${TRACKS[currentTrack].title} *** [128 KBPS] ***`;
+
+        updatePlaylistSelection();
+
+        clearInterval(playTimer);
+        const stepMs = Math.round((60 / TRACKS[currentTrack].bpm) * 500);
+        playTimer = setInterval(() => {
+          playNote();
+          trackTimeSeconds++;
+          const m = String(Math.floor(trackTimeSeconds / 60)).padStart(2, "0");
+          const s = String(trackTimeSeconds % 60).padStart(2, "0");
+          timeEl.textContent = `${m}:${s}`;
+        }, stepMs);
+
+        cancelAnimationFrame(visAnimFrame);
+        drawVisualizer();
+      }
+
+      function pause() {
+        isPlaying = false;
+        clearInterval(playTimer);
+        statusEl.textContent = "PAUSED";
+        statusEl.style.color = "#ffff00";
+        statusEl.style.background = "#333300";
+        cancelAnimationFrame(visAnimFrame);
+        drawVisualizer();
+      }
+
+      function stop() {
+        isPlaying = false;
+        clearInterval(playTimer);
+        trackTimeSeconds = 0;
+        noteStep = 0;
+        timeEl.textContent = "00:00";
+        statusEl.textContent = "STOPPED";
+        statusEl.style.color = "#ff6666";
+        statusEl.style.background = "#330000";
+        cancelAnimationFrame(visAnimFrame);
+        drawVisualizer();
+      }
+
+      function next() {
+        currentTrack = (currentTrack + 1) % TRACKS.length;
+        trackTimeSeconds = 0;
+        noteStep = 0;
+        if (isPlaying) play();
+        else {
+          titleEl.textContent = `${TRACKS[currentTrack].title} ***`;
+          updatePlaylistSelection();
+        }
+      }
+
+      function prev() {
+        currentTrack = (currentTrack - 1 + TRACKS.length) % TRACKS.length;
+        trackTimeSeconds = 0;
+        noteStep = 0;
+        if (isPlaying) play();
+        else {
+          titleEl.textContent = `${TRACKS[currentTrack].title} ***`;
+          updatePlaylistSelection();
+        }
+      }
+
+      function updatePlaylistSelection() {
+        $$(".winamp-pl-entry", windowElement).forEach((el, idx) => {
+          el.classList.toggle("is-active", idx === currentTrack);
+        });
+      }
+
       windowElement.addEventListener("click", (e) => {
-        if (e.target.closest("[data-lore='print']")) {
-          const text = $(".lore-text", windowElement)?.textContent || "";
-          window.LINKS_PRINTER.print({
-            title: "LINKS Lore Chapter",
-            content: text
-          });
+        const cmd = e.target.closest("[data-winamp-cmd]")?.dataset.winampCmd;
+        if (cmd === "play") play();
+        if (cmd === "pause") pause();
+        if (cmd === "stop") stop();
+        if (cmd === "next") next();
+        if (cmd === "prev") prev();
+        if (cmd === "eject") {
+          const pl = $("[data-winamp-playlist]", windowElement);
+          if (pl) pl.hidden = !pl.hidden;
+        }
+
+        const plEntry = e.target.closest(".winamp-pl-entry");
+        if (plEntry) {
+          currentTrack = parseInt(plEntry.dataset.trackIdx, 10) || 0;
+          trackTimeSeconds = 0;
+          noteStep = 0;
+          play();
         }
       });
-    };
-  }
+
+      volSlider.addEventListener("input", (e) => {
+        setVolume(e.target.value);
+      });
+
+      windowElement._winampStop = stop;
+      drawVisualizer();
+    },
+    unmount: (windowElement) => {
+      windowElement._winampStop?.();
+    }
+  };
+  APPS.media = APPS.winamp;
 
 })();

@@ -1247,6 +1247,354 @@ body[data-scheme="bull-market"] .window.is-active .titlebar { background: var(--
   background: var(--color-window);
 }
 
+/* ==========================================================================
+   FEATURE: RUGSWEEPER.EXE (Minesweeper Crypto Edition)
+   ========================================================================== */
+.rugsweeper-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-window);
+  user-select: none;
+}
+.rugsweeper-window-body {
+  padding: 8px;
+  background: var(--color-window);
+  border: 3px outset #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.rug-header-frame {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  border: 2px inset var(--color-window);
+  background: var(--color-window);
+}
+.rug-digital-counter {
+  background: #000000;
+  color: #ff0000;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 2px 6px;
+  border: 1px inset #808080;
+  min-width: 48px;
+  text-align: center;
+}
+.rug-face-btn {
+  width: 32px;
+  height: 32px;
+  padding: 2px;
+  border: 2px outset var(--color-window);
+  background: var(--color-window);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.rug-face-btn:active {
+  border-style: inset;
+}
+.rug-face-btn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.rug-grid-frame {
+  border: 3px inset var(--color-window);
+  background: #c0c0c0;
+  padding: 2px;
+}
+.rug-board {
+  display: grid;
+  grid-template-columns: repeat(9, 24px);
+  grid-template-rows: repeat(9, 24px);
+  gap: 0;
+  background: #808080;
+}
+.mine-cell {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+  border: 2px outset #ffffff;
+  background: #c0c0c0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  box-sizing: border-box;
+  outline: none;
+  touch-action: manipulation;
+}
+.mine-cell:active:not(.revealed) {
+  border: 1px solid #7b7b7b;
+  background: #bdbdbd;
+}
+.mine-cell.revealed {
+  border: 1px solid #7b7b7b;
+  background: #c0c0c0;
+  cursor: default;
+}
+.mine-cell.exploded {
+  background: #ff2222 !important;
+  border: 1px solid #800000;
+}
+.mine-cell.flagged {
+  color: #ff0000;
+}
+.mine-cell[data-num="1"] { color: #0000ff; }
+.mine-cell[data-num="2"] { color: #008000; }
+.mine-cell[data-num="3"] { color: #ff0000; }
+.mine-cell[data-num="4"] { color: #000080; }
+.mine-cell[data-num="5"] { color: #800000; }
+.mine-cell[data-num="6"] { color: #008080; }
+.mine-cell[data-num="7"] { color: #000000; }
+.mine-cell[data-num="8"] { color: #808080; }
+.rugsweeper-statusbar {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 6px;
+  border-top: 1px solid var(--color-window-mid);
+  background: var(--color-window);
+  font-size: 11px;
+}
+
+/* ==========================================================================
+   FEATURE: WINAMP.EXE (CatAMP 2.98 - LINKS Media Player)
+   ========================================================================== */
+.winamp-chassis {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #23272a;
+  color: #ffffff;
+  border: 2px outset #555555;
+  padding: 6px;
+  gap: 6px;
+  font-family: var(--font-mono);
+  user-select: none;
+  box-shadow: 2px 2px #000000;
+}
+.winamp-top-display {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 6px;
+  padding: 6px;
+  background: #000000;
+  border: 2px inset #555555;
+}
+.winamp-vis-canvas-wrap {
+  width: 76px;
+  height: 38px;
+  background: #051005;
+  border: 1px solid #004400;
+  display: grid;
+  place-items: center;
+}
+.winamp-vis-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+.winamp-lcd-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.winamp-lcd-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #00ff66;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
+.winamp-marquee-wrap {
+  height: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  background: #001500;
+  border: 1px solid #003300;
+  padding: 1px 3px;
+}
+.winamp-marquee-text {
+  display: inline-block;
+  color: #00ff66;
+  font-size: 11px;
+  font-weight: 700;
+  animation: winamp-marquee 12s linear infinite;
+}
+@keyframes winamp-marquee {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
+}
+.winamp-time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.winamp-time-display {
+  color: #39ff14;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.winamp-status-badge {
+  font-size: 9px;
+  color: #ffff00;
+  background: #333300;
+  padding: 0 4px;
+  border: 1px solid #666600;
+}
+.winamp-sliders-strip {
+  display: flex;
+  gap: 8px;
+  padding: 4px 6px;
+  background: #181a1b;
+  border: 1px inset #444;
+  align-items: center;
+}
+.winamp-slider-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #aaddaa;
+}
+.winamp-range {
+  flex: 1;
+  height: 8px;
+  accent-color: #00ff66;
+  cursor: pointer;
+}
+.winamp-controls-row {
+  display: flex;
+  gap: 3px;
+  justify-content: space-between;
+}
+.winamp-btn {
+  flex: 1;
+  min-height: 24px;
+  background: #2b3035;
+  color: #00ff66;
+  border: 2px outset #555;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.winamp-btn:active {
+  border-style: inset;
+  background: #1a1c1e;
+}
+.winamp-playlist-box {
+  flex: 1;
+  background: #000000;
+  border: 2px inset #555555;
+  padding: 4px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+}
+.winamp-pl-entry {
+  padding: 2px 4px;
+  color: #aaddaa;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.winamp-pl-entry:hover {
+  background: #002200;
+  color: #ffffff;
+}
+.winamp-pl-entry.is-active {
+  background: #000080;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   TASK MANAGER PERFORMANCE TAB
+   ========================================================================== */
+.tm-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.tm-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-window-mid);
+  padding-left: 4px;
+}
+.tm-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+  overflow-y: auto;
+}
+.tm-perf-cpu-box {
+  border: 2px inset var(--color-window);
+  background: #050d05;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tm-perf-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #55ff88;
+  font-weight: 700;
+}
+.tm-cpu-graph {
+  width: 100%;
+  height: 80px;
+  background: #000000;
+  border: 1px solid #004400;
+  display: block;
+}
+.tm-perf-stats-list {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 4px 10px;
+  padding: 8px;
+  background: var(--color-paper);
+  border: 2px inset var(--color-window);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin: 0;
+}
+.tm-perf-stats-list dt {
+  color: #555555;
+  font-weight: 700;
+}
+.tm-perf-stats-list dd {
+  margin: 0;
+  font-weight: 700;
+  color: #000080;
+}
+
 /* Authentic Shutdown Screen */
 .shutdown-content {
   position: absolute;

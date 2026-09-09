@@ -41,7 +41,7 @@
   };
   const file = name => `<button class="file-item" data-vfs="${escapeHTML(name)}"><img src="${icon(/internet/i.test(name)?"internet":/meme/i.test(name)?"memes":/moon/i.test(name)?"moon":name.includes(".")?"document":"my-computer")}" alt=""><span>${escapeHTML(name)}</span></button>`;
   let path = "My Computer", history = [path], historyAt = 0;
-  const mappedApp = name => ({"internet drive (l:)":"internet","memes (m:)":"memes","moon drive (x:)":"moon","links.exe":"links","links98_setup.exe":"setup","setup.exe":"setup","calculator":"calculator","paint":"paint","notepad":"notepad","links printer":"printer","printer":"printer","links solitaire":"solitaire","solitaire":"solitaire","links antivirus":"antivirus","antivirus":"antivirus","live tape":"livetape","holder map":"holdermap","internet weather":"weather"})[name.toLowerCase()];
+  const mappedApp = name => ({"internet drive (l:)":"internet","memes (m:)":"memes","moon drive (x:)":"moon","links.exe":"links","links98_setup.exe":"setup","setup.exe":"setup","calculator":"calculator","paint":"paint","notepad":"notepad","links printer":"printer","printer":"printer","links solitaire":"solitaire","solitaire":"solitaire","rugsweeper":"rugsweeper","rugsweeper.exe":"rugsweeper","minesweeper":"rugsweeper","winamp":"winamp","winamp.exe":"winamp","media":"winamp","links media player":"winamp","links antivirus":"antivirus","antivirus":"antivirus","live tape":"livetape","holder map":"holdermap","internet weather":"weather"})[name.toLowerCase()];
   const nextPath = name => name.includes("(A:)")?"A:\\":name.includes("(C:)")?"C:\\":path.endsWith("\\")?path+name:`${path}\\${name}`;
   function drawExplorer(win) { const list=VFS[path]||[]; $("[data-address]",win).value=path; $("[data-files]",win).innerHTML=list.map(file).join(""); $("[data-count]",win).textContent=`${list.length} object(s)`; $$('[data-tree]',win).forEach(x=>x.classList.toggle("is-current",x.dataset.tree===path)); }
   function go(to, win, push=true) { if(!VFS[to]) return; path=to; if(push){ history=history.slice(0,historyAt+1); history.push(to); historyAt++; } drawExplorer(win); }
@@ -166,35 +166,120 @@
   APPS.search={title:"Find: Files or Folders",icon:icon("my-computer"),width:650,height:470,status:"Ready",render:()=>`<form class="search-form"><label>Named: <input class="ca-field" data-query></label><button class="win-button">Find Now</button></form><div class="file-grid" data-results><p>Enter all or part of a file name.</p></div>`,mount:win=>$("form",win).onsubmit=e=>{e.preventDefault();const q=$("[data-query]",win).value.toLowerCase(),all=[...new Set(Object.values(VFS).flat())],found=all.filter(x=>x.toLowerCase().includes(q)||(q==="links"&&["lore.txt","links_cat.bmp"].includes(x.toLowerCase())));$("[data-results]",win).innerHTML=found.length?found.map(file).join(""):"<p>No files found.</p>";win.querySelector(".statusbar").textContent=`${found.length} object(s)`}};
   APPS.network={title:"THE INTERNET Status",icon:icon("internet"),width:420,height:340,menu:false,render:()=>`<div class="panel"><h2>Connected</h2><dl class="property-list"><dt>Connected to:</dt><dd>THE INTERNET</dd><dt>Speed:</dt><dd>56.0 Kbps</dd><dt>Duration:</dt><dd>00:42:17</dd><dt>Bytes sent:</dt><dd>cats</dd><dt>Bytes received:</dt><dd>memes</dd></dl></div><div class="dialog-actions"><button class="win-button" data-disconnect>Disconnect</button><button class="win-button" data-details>Details</button></div>`,mount:win=>win.onclick=e=>{if(e.target.closest("[data-disconnect]"))showDialog({title:"Network",message:"Connection cannot be closed.\nLinks is using the internet.",image:icon("internet")});if(e.target.closest("[data-details]"))showDialog({title:"Network Details",message:"Protocol: TCP/CAT\nStatus: Somehow still online.",image:icon("internet")})}};
   APPS.setup={title:"LINKS 98 Setup",icon:icon("my-computer"),width:590,height:430,menu:false,render:()=>`<div class="wizard"><div class="wizard-page"><div class="wizard-side"><img src="${appArt("installer-cat")}" alt=""></div><div class="wizard-copy"><h2>Welcome to LINKS 98 Setup</h2><p data-install>This wizard will install LINKS 98 into C:\\LINKS.</p><progress max="100" value="0"></progress></div></div><div class="wizard-footer"><button class="win-button" data-next>Next &gt;</button></div></div>`,mount:win=>$("[data-next]",win).onclick=()=>{const lines=["Copying cat.dll","Installing bullish.sys","Deleting selling.exe","Registering memes.ocx","Starting LINKS.exe","LINKS 98 has been successfully installed."];let i=0,t=setInterval(()=>{$("[data-install]",win).textContent=lines[i];$("progress",win).value=++i/lines.length*100;if(i===lines.length){clearInterval(t);set("installed",true)}},500)}};
-  APPS.taskmgr={title:"Close Program",icon:icon("my-computer"),width:460,height:390,menu:false,render:()=>`<div class="task-list" data-tasks></div><div class="dialog-actions"><button class="win-button" data-end>End Task</button><button class="win-button" data-switch>Switch To</button><button class="win-button" data-window-action="close">Cancel</button></div>`,mount:win=>{const refresh=()=>{
-    const openTasks = [...wm.windows.keys()].filter(k=>k!=="taskmgr").map((k,i)=>`<label><input type="radio" name="task" value="${k}" ${i?"":"checked"}> ${escapeHTML(APPS[k]?.title || k)}</label>`);
-    if (window.LINKS_ACTIVE_RUNNERS && window.LINKS_ACTIVE_RUNNERS.size > 0) {
-      openTasks.push(`<label><input type="radio" name="task" value="JSRUNTIME.EXE" ${openTasks.length ? "" : "checked"}> JSRUNTIME.EXE (JavaScript Runtime)</label>`);
+  APPS.taskmgr={title:"LINKS Task Manager",icon:icon("my-computer"),width:480,height:420,menu:false,render:()=>`
+    <div class="tm-shell" data-tm-root>
+      <div class="tabs tm-tabs" role="tablist">
+        <button class="tab" data-tm-tab="apps" aria-selected="true" type="button">Applications</button>
+        <button class="tab" data-tm-tab="perf" aria-selected="false" type="button">Performance</button>
+      </div>
+
+      <div class="tm-page" data-tm-page="apps">
+        <div class="task-list" data-tasks></div>
+        <div class="dialog-actions">
+          <button class="win-button" data-end>End Task</button>
+          <button class="win-button" data-switch>Switch To</button>
+          <button class="win-button" data-window-action="close">Cancel</button>
+        </div>
+      </div>
+
+      <div class="tm-page" data-tm-page="perf" hidden>
+        <div class="tm-perf-cpu-box">
+          <div class="tm-perf-header">
+            <span>NETWORK ACTIVITY (TPS)</span>
+            <span data-tm-tps>42 TPS</span>
+          </div>
+          <canvas class="tm-cpu-graph" width="440" height="80"></canvas>
+        </div>
+
+        <div class="panel settings-panel" style="padding: 6px;">
+          <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px;">CPU / MEMORY USAGE (64 MB)</div>
+          <progress max="100" value="98"></progress>
+        </div>
+
+        <dl class="tm-perf-stats-list">
+          <dt>Block Height:</dt><dd data-tm-block>#2,048,198</dd>
+          <dt>Gas / Priority:</dt><dd>0.001 Gwei (Ultra Low)</dd>
+          <dt>Network Status:</dt><dd>Robinhood Chain (4663)</dd>
+          <dt>Kernel Driver:</dt><dd>CAT.SYS (Administrator)</dd>
+          <dt>Active Threads:</dt><dd>98 Threads (Optimal)</dd>
+          <dt>Paper Hands:</dt><dd style="color: #008800;">DISABLED</dd>
+        </dl>
+      </div>
+    </div>`,mount:win=>{
+    let activeTab="apps";
+    let blockNum=2048198;
+    let tpsHistory=[35,42,48,55,60,45,52,68,58,49,62,70,65,50,42,58];
+    const canvas=$(".tm-cpu-graph",win);
+    const ctx=canvas?.getContext("2d");
+    const blockEl=$("[data-tm-block]",win);
+    const tpsEl=$("[data-tm-tps]",win);
+
+    function drawPerfGraph(){
+      if(!canvas||!ctx)return;
+      const w=canvas.width,h=canvas.height;
+      ctx.fillStyle="#000000";ctx.fillRect(0,0,w,h);
+      ctx.strokeStyle="#003300";ctx.lineWidth=1;
+      for(let x=20;x<w;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=16;y<h;y+=16){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+      ctx.strokeStyle="#00ff44";ctx.lineWidth=2;ctx.beginPath();
+      const step=w/(tpsHistory.length-1);
+      tpsHistory.forEach((val,idx)=>{
+        const x=idx*step;
+        const y=h-((val/100)*(h-10))-5;
+        if(idx===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
     }
-    $("[data-tasks]",win).innerHTML=openTasks.join("")||"No programs are running.";
-  };
-  refresh();
-  win.onclick=async e=>{
-    const k=$("input[name=task]:checked",win)?.value;
-    if(e.target.closest("[data-switch]")&&k&&k!=="JSRUNTIME.EXE")wm.focus(k);
-    if(e.target.closest("[data-end]")&&k){
-      if(k==="JSRUNTIME.EXE"){
-        if (window.LINKS_ACTIVE_RUNNERS) {
-          for(const runner of window.LINKS_ACTIVE_RUNNERS) runner.stop();
-        }
-        refresh();
+
+    function updatePerf(){
+      blockNum+=Math.floor(Math.random()*2)+1;
+      if(blockEl)blockEl.textContent=`#${blockNum.toLocaleString()}`;
+      const newTps=Math.floor(38+Math.random()*32);
+      if(tpsEl)tpsEl.textContent=`${newTps} TPS`;
+      tpsHistory.push(newTps);
+      if(tpsHistory.length>20)tpsHistory.shift();
+      drawPerfGraph();
+    }
+
+    const perfInterval=setInterval(()=>{if(win.isConnected&&activeTab==="perf")updatePerf();},1500);
+    win._tmPerfTimer=perfInterval;
+
+    const refresh=()=>{
+      const openTasks=[...wm.windows.keys()].filter(k=>k!=="taskmgr").map((k,i)=>`<label><input type="radio" name="task" value="${k}" ${i?"":"checked"}> ${escapeHTML(APPS[k]?.title||k)}</label>`);
+      if(window.LINKS_ACTIVE_RUNNERS&&window.LINKS_ACTIVE_RUNNERS.size>0){
+        openTasks.push(`<label><input type="radio" name="task" value="JSRUNTIME.EXE" ${openTasks.length?"":"checked"}> JSRUNTIME.EXE (JavaScript Runtime)</label>`);
+      }
+      $("[data-tasks]",win).innerHTML=openTasks.join("")||"No programs are running.";
+    };
+    refresh();
+    win.onclick=async e=>{
+      const tabBtn=e.target.closest("[data-tm-tab]");
+      if(tabBtn){
+        activeTab=tabBtn.dataset.tmTab;
+        $$("[data-tm-tab]",win).forEach(t=>t.setAttribute("aria-selected",String(t===tabBtn)));
+        $$("[data-tm-page]",win).forEach(p=>{p.hidden=p.dataset.tmPage!==activeTab;});
+        if(activeTab==="perf")setTimeout(drawPerfGraph,50);
         return;
       }
-      if(k==="links"){
-        const r=await showDialog({title:"Warning",message:"LINKS.exe is a critical system process.",image:cat("warning-cat"),buttons:["End Anyway","Cancel"]});
-        if(r!=="End Anyway")return;
-        desktop.classList.add("system-glitch");
-        wm.close(k);
-        setTimeout(()=>{desktop.classList.remove("system-glitch");wm.open("links");showDialog({title:"LINKS.exe",message:"Nice try.",image:cat("reactions/unimpressed")})},700);
-      } else wm.close(k);
-      refresh();
-    }
-  }}};
+      const k=$("input[name=task]:checked",win)?.value;
+      if(e.target.closest("[data-switch]")&&k&&k!=="JSRUNTIME.EXE")wm.focus(k);
+      if(e.target.closest("[data-end]")&&k){
+        if(k==="JSRUNTIME.EXE"){
+          if(window.LINKS_ACTIVE_RUNNERS){for(const runner of window.LINKS_ACTIVE_RUNNERS)runner.stop();}
+          refresh();
+          return;
+        }
+        if(k==="links"){
+          const r=await showDialog({title:"Warning",message:"LINKS.exe is a critical system process.",image:cat("warning-cat"),buttons:["End Anyway","Cancel"]});
+          if(r!=="End Anyway")return;
+          desktop.classList.add("system-glitch");
+          wm.close(k);
+          setTimeout(()=>{desktop.classList.remove("system-glitch");wm.open("links");showDialog({title:"LINKS.exe",message:"Nice try.",image:cat("reactions/unimpressed")})},700);
+        }else wm.close(k);
+        refresh();
+      }
+    };
+  },unmount:win=>clearInterval(win._tmPerfTimer)};
 
   let selected=new Set(), auto=get("autoArrange",false);
 

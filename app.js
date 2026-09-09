@@ -2462,6 +2462,7 @@
               </button>
               <div class="start-flyout-menu menu" data-flyout="links-games" hidden>
                 <button class="menu-item" type="button" data-start-app="arcade"><span class="menu-item-left"><img class="menu-item-icon" src="${appIcon("arcade")}" alt="">LINKS 98 Arcade</span></button>
+                <button class="menu-item" type="button" data-start-app="rugsweeper"><span class="menu-item-left"><img class="menu-item-icon" src="${appIcon("rugsweeper")}" alt="">RUGSWEEPER.EXE</span></button>
                 <button class="menu-item" type="button" data-start-app="solitaire"><span class="menu-item-left"><img class="menu-item-icon" src="${appIcon("solitaire")}" alt="">LINKS Solitaire</span></button>
                 <button class="menu-item" type="button" data-start-app="codechallenge"><span class="menu-item-left"><img class="menu-item-icon" src="${icon("terminal")}" alt="">Code Challenge</span></button>
               </div>
@@ -2502,6 +2503,7 @@
                 <span class="menu-item-arrow">▶</span>
               </button>
               <div class="start-flyout-menu menu" data-flyout="accessories" hidden>
+                <button class="menu-item" type="button" data-start-app="winamp"><span class="menu-item-left"><img class="menu-item-icon" src="${appIcon("winamp")}" alt="">LINKS Media Player (CatAMP)</span></button>
                 <button class="menu-item" type="button" data-start-app="notepad"><span class="menu-item-left"><img class="menu-item-icon" src="${icon("document")}" alt="">Notepad</span></button>
                 <button class="menu-item" type="button" data-start-app="paint"><span class="menu-item-left"><img class="menu-item-icon" src="${appIcon("paint")}" alt="">Paint</span></button>
                 <button class="menu-item" type="button" data-start-app="calculator"><span class="menu-item-left"><img class="menu-item-icon" src="${icon("document")}" alt="">Calculator</span></button>
@@ -2711,6 +2713,9 @@
         antivirus: "antivirus", av: "antivirus", virus: "antivirus",
         printer: "printer", print: "printer",
         solitaire: "solitaire", sol: "solitaire",
+        rugsweeper: "rugsweeper", minesweeper: "rugsweeper", sweep: "rugsweeper",
+        winamp: "winamp", media: "winamp", music: "winamp", catamp: "winamp", player: "winamp",
+        taskmgr: "taskmgr", taskmanager: "taskmgr", tasks: "taskmgr",
         weather: "weather", forecast: "weather"
       };
       finish();
