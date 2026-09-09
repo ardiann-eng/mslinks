@@ -2398,6 +2398,7 @@
     ["editor", "LINKS Code Editor", "editor"],
     ["notepad", "Notepad", "notepad"],
     ["terminal", "Command Prompt", "terminal"],
+    ["winamp", "CatAMP", "winamp"],
     ["antivirus", "Antivirus 98", "recycle-full"],
     ["printer", "Printers", "my-computer"],
     ["weather", "Weather 98", "internet"],
@@ -2668,7 +2669,6 @@
       const entry = e.target.closest(".start-entry");
       if (!entry) return;
 
-      // Close sibling entries on same level
       const parent = entry.parentElement;
       if (parent) {
         $$(":scope > .start-entry.is-open", parent).forEach(sibling => {
@@ -2684,9 +2684,9 @@
       if (flyout) {
         entry.classList.add("is-open");
         flyout.hidden = false;
-        const r = flyout.getBoundingClientRect();
-        flyout.classList.toggle("flip-left", r.right > window.innerWidth);
-        flyout.classList.toggle("flip-up", r.bottom > window.innerHeight);
+        const er = entry.getBoundingClientRect();
+        flyout.classList.toggle("flip-left", er.right + 190 > window.innerWidth);
+        flyout.classList.toggle("flip-up", er.top + 170 > window.innerHeight);
       }
     });
   }
