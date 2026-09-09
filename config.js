@@ -1,0 +1,55 @@
+/**
+ * LINKS 98 Centralized Token Configuration
+ * 
+ * Token launches through PONS on Robinhood Chain.
+ * If tokenAddress is empty, applications display "TOKEN NOT CONFIGURED".
+ */
+const LINKS_CONFIG = {
+  chainId: 4663,
+  chainName: "Robinhood Chain",
+  rpcUrl: "https://rpc.mainnet.chain.robinhood.com",
+  explorerUrl: "https://robinhoodchain.blockscout.com",
+
+  tokenAddress: "",
+  symbol: "LINKS",
+  decimals: 18,
+
+  ponsUrl: "",
+  buyUrl: "",
+  poolAddress: "",
+  launchBlock: null,
+
+  // Additional settings
+  largeTradeEthThreshold: 0.5,
+  xUrl: "https://x.com"
+};
+
+// Expose globally
+window.LINKS_CONFIG = LINKS_CONFIG;
+
+// Compatibility aliases for existing references
+Object.defineProperties(window.LINKS_CONFIG, {
+  TOKEN_NAME: { get() { return window.LINKS_CONFIG.symbol ? `$${window.LINKS_CONFIG.symbol}` : "$LINKS"; } },
+  CONTRACT_ADDRESS: { get() { return window.LINKS_CONFIG.tokenAddress || ""; } },
+  BUY_URL: { get() { return window.LINKS_CONFIG.buyUrl || window.LINKS_CONFIG.ponsUrl || ""; } },
+  X_URL: { get() { return window.LINKS_CONFIG.xUrl || "https://x.com"; } },
+  CHART_URL: { get() { return window.LINKS_CONFIG.tokenAddress ? `${window.LINKS_CONFIG.explorerUrl}/token/${window.LINKS_CONFIG.tokenAddress}` : ""; } },
+  EXPLORER_URL: { get() { return window.LINKS_CONFIG.explorerUrl || "https://robinhoodchain.blockscout.com"; } }
+});
+
+// TOKEN_CONFIG legacy object proxying to LINKS_CONFIG
+window.TOKEN_CONFIG = new Proxy(window.LINKS_CONFIG, {
+  get(target, prop) {
+    if (prop === "contractAddress") return target.tokenAddress;
+    if (prop === "chain") return "robinhood";
+    if (prop === "name") return "Links Cat";
+    if (prop in target) return target[prop];
+    return undefined;
+  },
+  set(target, prop, value) {
+    if (prop === "contractAddress") { target.tokenAddress = value; return true; }
+    target[prop] = value;
+    return true;
+  }
+});
+

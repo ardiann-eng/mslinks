@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#008080">
+  <meta name="description" content="LINKS 98 — a strange functioning desktop operating system controlled by Links Cat.">
+  <title>LINKS 98</title>
+  <link rel="icon" href="assets/icons/links.png">
+  <link rel="preload" as="image" href="assets/cats/sit.png">
+  <link rel="preload" as="image" href="assets/cats/reactions/confident.png">
+  <link rel="stylesheet" href="tokens.css?v=20260909-mobile1">
+  <link rel="stylesheet" href="styles.css?v=20260909-mobile1">
+  <script src="assets.js?v=20260909-mobile1"></script>
+  <script>window.PowerManagerPending = true;</script>
+</head>
+<body>
+  <noscript><div class="noscript">LINKS 98 requires JavaScript to boot.</div></noscript>
+  <div id="boot-screen" class="system-screen is-visible power-screen" aria-live="polite" tabindex="-1"></div>
+
+  <div id="login-screen" class="system-screen" hidden aria-label="LINKS 98 Login">
+    <div class="login-window dialog">
+      <div class="titlebar">
+        <img src="assets/icons/links.png" alt="" class="titlebar-icon">
+        <span class="titlebar-title">Welcome to LINKS 98</span>
+      </div>
+      <div class="login-body">
+        <div class="login-banner">
+          <div class="login-pfp-container">
+            <div class="login-pfp-box">
+              <img id="login-pfp-img" class="login-pfp-img" src="assets/cats/reactions/confident.png" alt="Selected User Cat PFP">
+            </div>
+            <button id="btn-choose-pfp" class="win-button pfp-choose-btn" type="button">Choose Picture...</button>
+          </div>
+          <div class="login-fields">
+            <div id="returning-user-section" class="returning-user-box" hidden>
+              <div>User: <strong id="returning-user-name">degen98</strong></div>
+            </div>
+            <div id="new-user-section">
+              <label for="login-username-input"><u>U</u>ser name:</label>
+              <input id="login-username-input" class="login-input" type="text" value="degen98" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="login-actions-row">
+              <button id="btn-login-submit" class="win-button" type="button">Log In</button>
+              <button id="btn-switch-user" class="win-button" type="button" hidden>Different User</button>
+            </div>
+            <div class="login-divider"><span>— or —</span></div>
+            <div class="wallet-login-row">
+              <button id="btn-login-wallet" class="win-button" type="button">Connect Wallet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main id="desktop" class="desktop" aria-label="LINKS 98 desktop" tabindex="-1">
+    <div id="desktop-icons" class="desktop-icons" role="list" aria-label="Desktop shortcuts"></div>
+    <button id="cat-hotspot" class="cat-hotspot" type="button" aria-label="Links Cat"></button>
+    <div id="window-layer" class="window-layer"></div>
+    <div id="context-menu" class="context-menu menu" role="menu" hidden></div>
+    <div id="start-menu" class="start-menu menu" role="menu" aria-label="Start menu" hidden></div>
+
+    <footer class="taskbar" aria-label="Taskbar">
+      <button id="start-button" class="start-button win-button" type="button" aria-expanded="false" aria-controls="start-menu">
+        <img src="assets/icons/links.png" alt=""> <strong>Start</strong>
+      </button>
+      <div class="taskbar-divider" aria-hidden="true"></div>
+      <div id="quick-launch" class="quick-launch" aria-label="Quick Launch toolbar">
+        <div class="quick-launch-grip" title="Quick Launch" aria-hidden="true"></div>
+        <span id="quick-launch-title" class="quick-launch-title" hidden>Quick Launch</span>
+        <div class="quick-launch-items">
+          <button class="quick-launch-btn" type="button" data-ql-app="links" data-ql-priority="1" aria-label="LINKS.exe">
+            <img src="assets/icons/links98/links-exe.png" alt="">
+            <span class="ql-label">LINKS.exe</span>
+          </button>
+          <button class="quick-launch-btn" type="button" data-ql-app="internet" data-ql-priority="5" aria-label="Internet">
+            <img src="assets/icons/internet.png" alt="">
+            <span class="ql-label">Internet</span>
+          </button>
+          <button class="quick-launch-btn" type="button" data-ql-app="terminal" data-ql-priority="4" aria-label="Command Prompt">
+            <img src="assets/icons/terminal.png" alt="">
+            <span class="ql-label">Command Prompt</span>
+          </button>
+          <button class="quick-launch-btn ql-chart-btn" type="button" data-ql-app="chart" data-ql-priority="3" aria-label="LINKS Chart">
+            <img src="assets/icons/links98/links-chart.png" alt="">
+            <span class="ql-status-dot" data-ql-status="idle" aria-hidden="true"></span>
+            <span class="ql-label">LINKS Chart</span>
+          </button>
+          <button class="quick-launch-btn" type="button" data-ql-app="arcade" data-ql-priority="6" aria-label="LINKS Games">
+            <img src="assets/icons/links98/links-games.png" alt="">
+            <span class="ql-label">LINKS Games</span>
+          </button>
+          <button class="quick-launch-btn" type="button" data-ql-action="show-desktop" data-ql-priority="2" aria-label="Show Desktop">
+            <img src="assets/icons/my-computer.png" alt="">
+            <span class="ql-label">Show Desktop</span>
+          </button>
+          <button id="ql-overflow-btn" class="quick-launch-btn ql-overflow-btn" type="button" aria-label="More Quick Launch icons" hidden>
+            <span>&gt;&gt;</span>
+          </button>
+        </div>
+      </div>
+      <div class="taskbar-divider" aria-hidden="true"></div>
+      <div id="task-buttons" class="task-buttons" aria-label="Open applications"></div>
+      <div class="tray">
+        <button id="tray-overflow-btn" class="tray-button tray-overflow-btn" type="button" aria-label="System Tray Items" hidden>&gt;&gt;</button>
+        <button id="sound-toggle" class="tray-button" type="button" aria-label="Mute system sounds" aria-pressed="false">🔊</button>
+        <button id="clock" class="clock" type="button" aria-label="Open secret clock action" title="Local time"></button>
+      </div>
+    </footer>
+  </main>
+
+  <div id="screensaver" class="screensaver" hidden aria-label="Links Cat screensaver">
+    <img id="screensaver-cat" src="assets/cats/screensaver-cat.png" alt="Links Cat bouncing around the screen">
+    <div id="corner-achievement" class="achievement" role="status" hidden>
+      <strong>ACHIEVEMENT UNLOCKED</strong><br>You actually waited for that.
+    </div>
+  </div>
+
+  <div id="crash-screen" class="system-screen" hidden tabindex="0">
+    <img src="assets/screens/blue-screen.jpg" alt="LINKS 98 crash screen. Press any key to continue.">
+  </div>
+  <div id="shutdown-screen" class="system-screen" hidden tabindex="0">
+    <div class="shutdown-content">
+      <div class="shutdown-text">It is now safe to turn off<br>your LINKS.</div>
+      <img src="assets/cats/sleep-side.png" alt="Sleeping Links Cat" class="shutdown-cat-img">
+      <button class="boot-again win-button" type="button">Boot again</button>
+    </div>
+  </div>
+
+  <div id="power-transition-screen" class="system-screen power-screen" hidden aria-live="polite"></div>
+  <div id="standby-screen" class="system-screen power-screen" hidden tabindex="0" aria-label="LINKS 98 standby"></div>
+  <div id="monitor-off-screen" class="system-screen power-screen" hidden tabindex="0" aria-label="Monitor off"></div>
+
+  <div id="dialog-layer" class="dialog-layer" aria-live="polite"></div>
+  <div id="win-tooltip" class="win-tooltip" hidden role="tooltip"></div>
+  <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js?v=20260909-mobile1"></script>
+  <script src="system.js?v=20260909-mobile1"></script>
+  <script src="crypto-system.js?v=20260909-mobile1"></script>
+  <script src="features.js?v=20260909-mobile1"></script>
+  <script src="terminal-ide.js?v=20260909-mobile1"></script>
+  <script src="power-manager.js?v=20260909-mobile1"></script>
+</body>
+</html>

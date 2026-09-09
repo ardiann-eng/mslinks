@@ -1,0 +1,315 @@
+{
+  "source_count": 22,
+  "processed": {
+    "assets/screens/blue-screen.jpg": [
+      1376,
+      768
+    ],
+    "assets/lore/internet-journey.jpg": [
+      1200,
+      896
+    ],
+    "assets/lore/lost-computers.jpg": [
+      1376,
+      768
+    ],
+    "assets/screens/shutdown.jpg": [
+      1376,
+      768
+    ],
+    "assets/screens/boot.jpg": [
+      1376,
+      768
+    ],
+    "assets/easter-eggs/behind-desktop.jpg": [
+      1376,
+      768
+    ],
+    "assets/wallpaper/links-hill.jpg": [
+      1376,
+      768
+    ],
+    "assets/easter-eggs/market-control-room.jpg": [
+      1200,
+      896
+    ],
+    "assets/apps/calculator-cat.png": [
+      507,
+      391
+    ],
+    "assets/apps/mouse-cat.png": [
+      506,
+      475
+    ],
+    "assets/apps/terminal-cat.png": [
+      501,
+      359
+    ],
+    "assets/apps/paint-cat.png": [
+      600,
+      331
+    ],
+    "assets/apps/computer-hug-cat.png": [
+      440,
+      336
+    ],
+    "assets/cats/screensaver-cat.png": [
+      369,
+      275
+    ],
+    "assets/apps/installer-cat.png": [
+      778,
+      329
+    ],
+    "assets/apps/about-cat.png": [
+      471,
+      325
+    ],
+    "assets/apps/market-control-cat.png": [
+      1123,
+      727
+    ],
+    "assets/cats/warning-cat.png": [
+      703,
+      866
+    ],
+    "assets/apps/recycle-bin-cat.png": [
+      755,
+      771
+    ],
+    "assets/cats/sit.png": [
+      274,
+      274
+    ],
+    "assets/cats/stand.png": [
+      285,
+      285
+    ],
+    "assets/cats/walk.png": [
+      340,
+      252
+    ],
+    "assets/cats/sleep-side.png": [
+      298,
+      180
+    ],
+    "assets/cats/sleep-curled.png": [
+      292,
+      175
+    ],
+    "assets/cats/computer.png": [
+      311,
+      260
+    ],
+    "assets/cats/point.png": [
+      344,
+      280
+    ],
+    "assets/cats/celebrate.png": [
+      282,
+      274
+    ],
+    "assets/cats/reactions/confident.png": [
+      355,
+      379
+    ],
+    "assets/cats/reactions/concerned.png": [
+      338,
+      376
+    ],
+    "assets/cats/reactions/shocked.png": [
+      346,
+      380
+    ],
+    "assets/cats/reactions/annoyed.png": [
+      367,
+      346
+    ],
+    "assets/cats/reactions/laughing.png": [
+      346,
+      362
+    ],
+    "assets/cats/reactions/unimpressed.png": [
+      355,
+      335
+    ],
+    "assets/cats/reactions/sleepy.png": [
+      348,
+      348
+    ],
+    "assets/cats/reactions/celebrating.png": [
+      407,
+      368
+    ],
+    "assets/icons/links.png": [
+      279,
+      272
+    ],
+    "assets/icons/my-computer.png": [
+      269,
+      258
+    ],
+    "assets/icons/lore.png": [
+      230,
+      270
+    ],
+    "assets/icons/memes.png": [
+      268,
+      241
+    ],
+    "assets/icons/document.png": [
+      236,
+      265
+    ],
+    "assets/icons/community.png": [
+      326,
+      226
+    ],
+    "assets/icons/internet.png": [
+      247,
+      246
+    ],
+    "assets/icons/moon.png": [
+      254,
+      224
+    ],
+    "assets/icons/recycle-empty.png": [
+      243,
+      266
+    ],
+    "assets/icons/recycle-full.png": [
+      230,
+      274
+    ],
+    "assets/icons/terminal.png": [
+      274,
+      246
+    ],
+    "assets/icons/market.png": [
+      266,
+      250
+    ],
+    "assets/memes/memes (41).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (1).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (28).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (29).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (30).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (5).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (6).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (7).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (31).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (19).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (20).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (21).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (22).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (23).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (24).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (25).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (32).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (33).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (34).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (35).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (36).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (37).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (38).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (39).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (40).jpg": [
+      1024,
+      1024
+    ],
+    "assets/memes/memes (26).jpg": [
+      1200,
+      896
+    ],
+    "assets/memes/memes (27).jpg": [
+      1376,
+      768
+    ],
+    "assets/apps/sleep-cat.png": [
+      369,
+      275
+    ],
+    "assets/wallpaper/links-hill.png": [
+      1678,
+      937
+    ]
+  },
+  "replacement_sources": [
+    "ChatGPT Image 9 Sep 2026, 11.43.03.png",
+    "ChatGPT Image 9 Sep 2026, 11.46.54.png",
+    "ChatGPT Image 9 Sep 2026, 11.58.36.png",
+    "image.png"
+  ]
+}
