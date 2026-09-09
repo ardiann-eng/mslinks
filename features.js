@@ -559,6 +559,7 @@
     icon: appIcon("holdermap"),
     width: 760,
     height: 560,
+    menu: false,
     status: "Ready.",
     render: () => {
       const ca = CONFIG.tokenAddress;
@@ -1197,6 +1198,7 @@ Please clear the cat before continuing print jobs.
     icon: appIcon("solitaire"),
     width: 780,
     height: 560,
+    menu: false,
     render: () => {
       const stats = JSON.parse(localStorage.getItem("links98:solitaire_stats") || '{"played":0,"won":0,"bestTime":null}');
 

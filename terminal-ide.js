@@ -1354,6 +1354,7 @@ Type 'node hello.js' or 'edit script.js' to write code.
     icon: icon("document"),
     width: 740,
     height: 540,
+    menu: false,
     render: () => `
       <div class="ide-container" data-ide-root>
         <nav class="menubar" aria-label="Editor Menu">
