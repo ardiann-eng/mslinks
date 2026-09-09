@@ -362,19 +362,22 @@
     const rect=m.getBoundingClientRect();
     const left=Math.max(4,Math.min(x,innerWidth-(rect.width||190)-4)),top=Math.max(4,Math.min(y,innerHeight-(rect.height||220)-4));
     Object.assign(m.style,{left:`${left}px`,top:`${top}px`});
-    let timer;
-    m.onpointerover=e=>{if(e.pointerType==="touch")return;const entry=e.target.closest(".context-entry");if(!entry||!m.contains(entry))return;clearTimeout(timer);$$('.context-entry.is-open',m).forEach(v=>{if(v!==entry&&!v.contains(entry))v.classList.remove("is-open")});if($(":scope > .context-submenu",entry))timer=setTimeout(()=>{entry.classList.add("is-open");const sub=$(":scope > .context-submenu",entry),r=sub.getBoundingClientRect();sub.classList.toggle("flip-left",r.right>innerWidth);sub.classList.toggle("flip-up",r.bottom>innerHeight)},140)};
-    m.onpointerleave=()=>clearTimeout(timer);
-    m.onclick=e=>{
-      const entry=e.target.closest(".context-entry");
-      const sub=$(":scope > .context-submenu",entry);
-      if(sub&&e.target.closest(".menu-item")){
-        entry.classList.toggle("is-open");
-        const r=sub.getBoundingClientRect();
-        sub.classList.toggle("flip-left",r.right>innerWidth);
-        sub.classList.toggle("flip-up",r.bottom>innerHeight);
-      }
-    };
+    $$(".context-entry", m).forEach(entry => {
+      const sub = $(":scope > .context-submenu", entry);
+      if (!sub) return;
+      const updateFlip = () => {
+        const er = entry.getBoundingClientRect();
+        sub.classList.toggle("flip-left", er.right + 170 > innerWidth);
+        sub.classList.toggle("flip-up", er.top + 150 > innerHeight);
+      };
+      entry.addEventListener("pointerenter", updateFlip);
+      entry.addEventListener("click", e => {
+        if (e.target.closest(".menu-item")) {
+          entry.classList.toggle("is-open");
+          updateFlip();
+        }
+      });
+    });
   }
 
   // Universal Touch Long-Press -> Right Click
