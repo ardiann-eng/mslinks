@@ -468,7 +468,7 @@
         p[x.dataset.desktopApp]={left:x.style.left,top:x.style.top};
       }
     });
-    set("iconPositions_v5",p);
+    set("iconPositions_v6",p);
   }
   function restorePositions(){
     renderCustomDesktopItems();
@@ -484,7 +484,7 @@
       return;
     }
 
-    const p=get("iconPositions_v5",null);
+    const p=get("iconPositions_v6",null);
     const rows = Math.max(4, Math.min(8, Math.floor((innerHeight - 60) / 96)));
     icons.dataset.freeMode="true";
 
@@ -493,8 +493,8 @@
         x.dataset.free="true";
         const col = Math.floor(i / rows);
         const row = i % rows;
-        x.style.left=`${16+col*98}px`;
-        x.style.top=`${16+row*92}px`;
+        x.style.left=`${16+col*104}px`;
+        x.style.top=`${16+row*96}px`;
       });
       savePositions();
       return;
@@ -508,19 +508,21 @@
       if (p[k] && p[k].left && p[k].top) {
         const l = parseInt(p[k].left, 10) || 0;
         const t = parseInt(p[k].top, 10) || 0;
-        const gridKey = `${Math.round(l / 98)}_${Math.round(t / 92)}`;
-        if (!occupied.has(gridKey)) {
+        const col = Math.max(0, Math.round((l - 16) / 104));
+        const row = Math.max(0, Math.round((t - 16) / 96));
+        const gridKey = `${col}_${row}`;
+        if (row < rows && !occupied.has(gridKey)) {
           occupied.add(gridKey);
           x.dataset.free="true";
-          x.style.left=p[k].left;
-          x.style.top=p[k].top;
+          x.style.left=`${16+col*104}px`;
+          x.style.top=`${16+row*96}px`;
           return;
         }
       }
       unplaced.push(x);
     });
 
-    // Place any new or overlapping icons in the next available slots
+    // Place any new or overlapping icons in the next available slots in clean columns
     let slot = 0;
     unplaced.forEach(x => {
       while (true) {
@@ -531,8 +533,8 @@
         if (!occupied.has(key)) {
           occupied.add(key);
           x.dataset.free="true";
-          x.style.left=`${16+col*98}px`;
-          x.style.top=`${16+row*92}px`;
+          x.style.left=`${16+col*104}px`;
+          x.style.top=`${16+row*96}px`;
           break;
         }
       }

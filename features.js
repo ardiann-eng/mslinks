@@ -2284,6 +2284,10 @@ Please clear the cat before continuing print jobs.
           <div class="winamp-pl-entry" data-track-idx="1">2. Degen Hills - 56k Chiptune Dreams</div>
           <div class="winamp-pl-entry" data-track-idx="2">3. Green Candle Symphony in C Minor</div>
           <div class="winamp-pl-entry" data-track-idx="3">4. Moon Mission (8-Bit Cat Beat)</div>
+          <div class="winamp-pl-entry" data-track-idx="4">5. Cyber Cat 1999 (Eurobeat Remix)</div>
+          <div class="winamp-pl-entry" data-track-idx="5">6. Windows 98 Sunset (Vaporwave Vibe)</div>
+          <div class="winamp-pl-entry" data-track-idx="6">7. Pump the Gas (Robinhood Chiptune Beat)</div>
+          <div class="winamp-pl-entry" data-track-idx="7">8. Lofi Midnight Meow (Chill Cat Lounge)</div>
         </div>
       </div>
     `,
@@ -2292,7 +2296,11 @@ Please clear the cat before continuing print jobs.
         { title: "1. Links Cat - Dial-Up Anthem (1998)", bpm: 130, notes: [261.63, 329.63, 392.00, 523.25, 440.00, 392.00, 329.63, 293.66, 261.63, 392.00, 523.25, 659.25, 587.33, 523.25, 392.00, 329.63], bass: [130.81, 130.81, 164.81, 164.81, 110.00, 110.00, 146.83, 146.83] },
         { title: "2. Degen Hills - 56k Chiptune Dreams", bpm: 120, notes: [329.63, 392.00, 493.88, 587.33, 493.88, 392.00, 329.63, 246.94, 293.66, 369.99, 440.00, 587.33, 440.00, 369.99, 293.66, 220.00], bass: [164.81, 164.81, 123.47, 123.47, 146.83, 146.83, 110.00, 110.00] },
         { title: "3. Green Candle Symphony in C Minor", bpm: 138, notes: [261.63, 311.13, 392.00, 466.16, 523.25, 466.16, 392.00, 311.13, 233.08, 293.66, 349.23, 466.16, 349.23, 293.66, 233.08, 196.00], bass: [130.81, 130.81, 116.54, 116.54, 146.83, 146.83, 98.00, 98.00] },
-        { title: "4. Moon Mission (8-Bit Cat Beat)", bpm: 125, notes: [392.00, 493.88, 587.33, 783.99, 659.25, 587.33, 493.88, 392.00, 349.23, 440.00, 523.25, 698.46, 587.33, 523.25, 440.00, 349.23], bass: [98.00, 98.00, 130.81, 130.81, 87.31, 87.31, 116.54, 116.54] }
+        { title: "4. Moon Mission (8-Bit Cat Beat)", bpm: 125, notes: [392.00, 493.88, 587.33, 783.99, 659.25, 587.33, 493.88, 392.00, 349.23, 440.00, 523.25, 698.46, 587.33, 523.25, 440.00, 349.23], bass: [98.00, 98.00, 130.81, 130.81, 87.31, 87.31, 116.54, 116.54] },
+        { title: "5. Cyber Cat 1999 (Eurobeat Remix)", bpm: 144, notes: [440.00, 523.25, 659.25, 880.00, 783.99, 659.25, 523.25, 440.00, 392.00, 493.88, 587.33, 783.99, 659.25, 587.33, 493.88, 392.00], bass: [110.00, 110.00, 130.81, 130.81, 98.00, 98.00, 123.47, 123.47] },
+        { title: "6. Windows 98 Sunset (Vaporwave Vibe)", bpm: 95, notes: [293.66, 369.99, 440.00, 554.37, 440.00, 369.99, 293.66, 220.00, 261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 261.63, 196.00], bass: [146.83, 146.83, 110.00, 110.00, 130.81, 130.81, 98.00, 98.00] },
+        { title: "7. Pump the Gas (Robinhood Chiptune Beat)", bpm: 135, notes: [523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25, 392.00, 440.00, 523.25, 659.25, 880.00, 659.25, 523.25, 440.00, 349.23], bass: [130.81, 130.81, 164.81, 164.81, 110.00, 110.00, 87.31, 87.31] },
+        { title: "8. Lofi Midnight Meow (Chill Cat Lounge)", bpm: 88, notes: [349.23, 440.00, 523.25, 659.25, 523.25, 440.00, 349.23, 261.63, 329.63, 392.00, 493.88, 587.33, 493.88, 392.00, 329.63, 246.94], bass: [87.31, 87.31, 110.00, 110.00, 82.41, 82.41, 123.47, 123.47] }
       ];
 
       let currentTrack = 0;
