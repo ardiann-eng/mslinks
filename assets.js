@@ -36,6 +36,7 @@
     notepad: "assets/icons/links98/notepad.png",
     "code-editor": "assets/icons/links98/code-editor.png",
     editor: "assets/icons/links98/editor.png",
+    folder: "assets/icons/folder.png",
   });
 
   const appIconRegistry = Object.freeze({

@@ -3064,7 +3064,11 @@
       const now = performance.now();
       const app = shortcut.dataset.desktopApp;
       if (lastShortcutEl === shortcut && now - lastShortcutTap < 450) {
-        if (app) wm.open(app);
+        if (shortcut.dataset.custom === "true" && window.LINKS_OS?.openCustomItem) {
+          window.LINKS_OS.openCustomItem(app);
+        } else if (app) {
+          wm.open(app);
+        }
         lastShortcutTap = 0;
         lastShortcutEl = null;
         return;
@@ -3077,11 +3081,22 @@
     });
     $("#desktop-icons").addEventListener("dblclick", (event) => {
       const shortcut = event.target.closest("[data-desktop-app]");
-      if (shortcut) wm.open(shortcut.dataset.desktopApp);
+      if (!shortcut) return;
+      if (shortcut.dataset.custom === "true" && window.LINKS_OS?.openCustomItem) {
+        window.LINKS_OS.openCustomItem(shortcut.dataset.desktopApp);
+      } else if (shortcut.dataset.desktopApp) {
+        wm.open(shortcut.dataset.desktopApp);
+      }
     });
     $("#desktop-icons").addEventListener("keydown", (event) => {
       const shortcut = event.target.closest("[data-desktop-app]");
-      if (shortcut && event.key === "Enter") wm.open(shortcut.dataset.desktopApp);
+      if (shortcut && event.key === "Enter") {
+        if (shortcut.dataset.custom === "true" && window.LINKS_OS?.openCustomItem) {
+          window.LINKS_OS.openCustomItem(shortcut.dataset.desktopApp);
+        } else if (shortcut.dataset.desktopApp) {
+          wm.open(shortcut.dataset.desktopApp);
+        }
+      }
     });
     desktop.addEventListener("pointerdown", (event) => {
       if (!event.target.closest(".desktop-icon,.window,.taskbar,.menu,.start-menu,.cat-hotspot")) {

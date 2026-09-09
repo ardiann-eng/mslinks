@@ -72,7 +72,7 @@
     if(name==="SELL.EXE") return showDialog({title:"Access Denied",message:"Selling has been disabled by LINKS CAT.",image:cat("warning-cat")});
     showDialog({title:name,message:`Type: File\nLocation: ${path}\nStatus: Still here.`,image:icon("document")});
   }
-  APPS.computer={title:"My Computer",icon:icon("my-computer"),width:760,height:520,status:"Explorer",render:()=>`<div class="explorer-toolbar"><button class="win-button" data-nav="back">Back</button><button class="win-button" data-nav="forward">Forward</button><button class="win-button" data-nav="up">Up</button><button class="win-button" data-nav="view">View</button></div><div class="address-row"><span>Address</span><input data-address readonly></div><div class="explorer-shell"><nav class="folder-tree"><button data-tree="My Computer">Desktop<br>└ My Computer</button><button data-tree="C:\\">&nbsp;├ Local Disk (C:)</button><button data-tree="C:\\DEV">&nbsp;│ ├ DEV</button><button data-tree="C:\\LINKS">&nbsp;│ ├ LINKS</button><button data-tree="C:\\PROGRAMS">&nbsp;│ ├ PROGRAMS</button><button data-tree="C:\\USERS">&nbsp;│ ├ USERS</button><button data-tree="C:\\MEMES">&nbsp;│ ├ MEMES</button><button data-tree="C:\\SYSTEM">&nbsp;│ └ SYSTEM</button><button data-tree="Recycle Bin">└ Recycle Bin</button></nav><div class="file-grid" data-files></div></div><div class="statusbar" data-count></div>`,mount:win=>{path="My Computer";history=[path];historyAt=0;drawExplorer(win);win.onclick=e=>{const tree=e.target.closest("[data-tree]");if(tree)go(tree.dataset.tree,win);const n=e.target.closest("[data-nav]")?.dataset.nav;if(n==="back"&&historyAt){path=history[--historyAt];drawExplorer(win)}if(n==="forward"&&historyAt<history.length-1){path=history[++historyAt];drawExplorer(win)}if(n==="up"){const i=path.lastIndexOf("\\");go(i<=2?"My Computer":path.slice(0,i),win)}if(n==="view")$("[data-files]",win).classList.toggle("is-list-view");const vfs=e.target.closest("[data-vfs]");if(vfs&&window.innerWidth<=600)openItem(vfs.dataset.vfs,win)};win.ondblclick=e=>{const x=e.target.closest("[data-vfs]");if(x)openItem(x.dataset.vfs,win)}}};
+  APPS.computer={title:"My Computer",icon:icon("my-computer"),width:760,height:520,status:"Explorer",render:()=>`<div class="explorer-toolbar"><button class="win-button" data-nav="back">Back</button><button class="win-button" data-nav="forward">Forward</button><button class="win-button" data-nav="up">Up</button><button class="win-button" data-nav="view">View</button></div><div class="address-row"><span>Address</span><input data-address readonly></div><div class="explorer-shell"><nav class="folder-tree"><button data-tree="My Computer">Desktop<br>└ My Computer</button><button data-tree="C:\\">&nbsp;├ Local Disk (C:)</button><button data-tree="C:\\DEV">&nbsp;│ ├ DEV</button><button data-tree="C:\\LINKS">&nbsp;│ ├ LINKS</button><button data-tree="C:\\PROGRAMS">&nbsp;│ ├ PROGRAMS</button><button data-tree="C:\\USERS">&nbsp;│ ├ USERS</button><button data-tree="C:\\MEMES">&nbsp;│ ├ MEMES</button><button data-tree="C:\\SYSTEM">&nbsp;│ └ SYSTEM</button><button data-tree="Recycle Bin">└ Recycle Bin</button></nav><div class="file-grid" data-files></div></div><div class="statusbar" data-count></div>`,mount:win=>{path=VFS[path]?path:"My Computer";history=[path];historyAt=0;drawExplorer(win);win.onclick=e=>{const tree=e.target.closest("[data-tree]");if(tree)go(tree.dataset.tree,win);const n=e.target.closest("[data-nav]")?.dataset.nav;if(n==="back"&&historyAt){path=history[--historyAt];drawExplorer(win)}if(n==="forward"&&historyAt<history.length-1){path=history[++historyAt];drawExplorer(win)}if(n==="up"){const i=path.lastIndexOf("\\");go(i<=2?"My Computer":path.slice(0,i),win)}if(n==="view")$("[data-files]",win).classList.toggle("is-list-view");const vfs=e.target.closest("[data-vfs]");if(vfs&&window.innerWidth<=600)openItem(vfs.dataset.vfs,win)};win.ondblclick=e=>{const x=e.target.closest("[data-vfs]");if(x)openItem(x.dataset.vfs,win)}}};
   function password(win){const b=document.createElement("div");b.className="dialog-backdrop";b.innerHTML=`<form class="dialog"><div class="titlebar"><span class="titlebar-title">Enter Network Password</span></div><div class="dialog-body"><img class="dialog-icon" src="${cat("reactions/concerned")}" alt=""><div><label>Password:</label><input class="ca-field" type="password"></div></div><div class="dialog-actions"><button class="win-button">OK</button><button type="button" class="win-button" data-cancel>Cancel</button></div></form>`;$("#dialog-layer").append(b);$("form",b).onsubmit=e=>{e.preventDefault();if($("input",b).value.toLowerCase()==="meow"){b.remove();set("secret",true);go("C:\\LINKS\\DO_NOT_OPEN",win)}else showDialog({title:"Access Denied",message:"Incorrect password.",type:"error"})};$("[data-cancel]",b).onclick=()=>b.remove();$("input",b).focus()}
   APPS.notepad={
     title:"Untitled - Notepad",
@@ -83,32 +83,65 @@
     render:()=>`<div class="notepad-menu"><button data-note="new">File: New</button><button data-note="open">Open</button><button data-note="save">Save As</button><button data-note="search">Search</button><button data-note="help">Help</button></div><textarea class="notepad-area" spellcheck="false"></textarea>`,
     mount:win=>{
       const a=$("textarea",win);
-      a.value=get("notepad",notes["cat_notes.txt"]);
+      const activeId = get("active_editing_file_id", null);
+      let activeFileName = "Untitled";
+      if (activeId) {
+        const item = (get("custom_desktop_items_v2", [])).find(t => t.id === activeId);
+        if (item) {
+          activeFileName = item.name;
+          a.value = item.content !== undefined ? item.content : (notes[item.name] || "");
+          const title = $(".titlebar-title", win);
+          if (title) title.textContent = `${activeFileName} - Notepad`;
+        } else {
+          a.value = get("notepad", notes["cat_notes.txt"]);
+        }
+      } else {
+        a.value=get("notepad",notes["cat_notes.txt"]);
+      }
+
       win.onclick=async e=>{
         const x=e.target.closest("[data-note]")?.dataset.note;
         if(x==="new"){
           a.value="";
+          set("active_editing_file_id", null);
+          const title = $(".titlebar-title", win);
+          if (title) title.textContent = "Untitled - Notepad";
           a.focus();
         }
         if(x==="open"){
           a.value=notes["README.txt"];
+          set("active_editing_file_id", null);
+          const title = $(".titlebar-title", win);
+          if (title) title.textContent = "README.txt - Notepad";
           a.focus();
         }
         if(x==="save"){
           set("notepad",a.value);
+          const curId = get("active_editing_file_id", null);
+          let fileName = "untitled.txt";
+          if (curId) {
+            const items = get("custom_desktop_items_v2", []);
+            const target = items.find(t => t.id === curId);
+            if (target) {
+              target.content = a.value;
+              set("custom_desktop_items_v2", items);
+              notes[target.name] = a.value;
+              fileName = target.name;
+            }
+          }
           try {
             const blob = new Blob([a.value], { type: "text/plain;charset=utf-8" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = "untitled.txt";
+            link.download = fileName;
             document.body.appendChild(link);
             link.click();
             link.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
           } catch (_) {}
-          announce("Saved as untitled.txt");
-          await showDialog({ title:"Notepad", message:"Document saved as untitled.txt.", image:icon("document") });
+          announce(`Saved as ${fileName}`);
+          await showDialog({ title:"Notepad", message:`Document saved as ${fileName}.`, image:icon("document") });
         }
         if(x==="search"){
           showDialog({title:"Notepad Search",message:"Use Ctrl+F to search this document.",image:icon("document")});
@@ -164,6 +197,161 @@
   }}};
 
   let selected=new Set(), auto=get("autoArrange",false);
+
+  const getCustomItems = () => get("custom_desktop_items_v2", []);
+  const setCustomItems = v => set("custom_desktop_items_v2", v);
+
+  function syncCustomItemsVFS() {
+    const items = getCustomItems();
+    items.forEach(it => {
+      if (it.kind === "folder") {
+        const vPath = it.vfsPath || `C:\\USERS\\DEGEN98\\${it.name}`;
+        if (!VFS[vPath]) VFS[vPath] = it.items || [];
+      } else {
+        if (it.content !== undefined) notes[it.name] = it.content;
+      }
+    });
+  }
+  syncCustomItemsVFS();
+
+  function renderCustomDesktopItems() {
+    $$('.desktop-icon[data-custom="true"]', icons).forEach(el => el.remove());
+    const items = getCustomItems();
+    const iconNames = { folder: "folder", text: "document", links: "links", shortcut: "links" };
+    items.forEach(item => {
+      const el = document.createElement("button");
+      el.className = "desktop-icon";
+      el.dataset.desktopApp = item.id;
+      el.dataset.custom = "true";
+      el.dataset.customKind = item.kind;
+      el.dataset.customName = item.name;
+      el.setAttribute("role", "listitem");
+      el.setAttribute("aria-label", `${item.name}. Double click to open.`);
+      el.innerHTML = `<img src="${icon(iconNames[item.kind] || "document")}" alt=""><span>${escapeHTML(item.name)}</span>`;
+      icons.append(el);
+    });
+  }
+
+  function openCustomItem(id) {
+    const items = getCustomItems();
+    const item = items.find(x => x.id === id);
+    if (!item) return;
+
+    if (item.kind === "folder") {
+      const vPath = item.vfsPath || `C:\\USERS\\DEGEN98\\${item.name}`;
+      if (!VFS[vPath]) VFS[vPath] = [];
+      path = vPath;
+      history = [path];
+      historyAt = 0;
+      wm.open("computer");
+      const compWin = wm.windows.get("computer");
+      if (compWin) {
+        drawExplorer(compWin.element);
+      }
+      return;
+    }
+
+    if (item.kind === "text" || item.kind === "links") {
+      const fileContent = item.content !== undefined ? item.content : (notes[item.name] || "");
+      set("notepad", fileContent);
+      set("active_editing_file_id", item.id);
+      wm.close("notepad");
+      wm.open("notepad");
+      const noteWin = wm.windows.get("notepad");
+      if (noteWin) {
+        const title = $(".titlebar-title", noteWin.element);
+        if (title) title.textContent = `${item.name} - Notepad`;
+      }
+      return;
+    }
+
+    if (item.kind === "shortcut") {
+      wm.open("links");
+    }
+  }
+
+  async function deleteDesktopItem(id) {
+    const items = getCustomItems();
+    const item = items.find(x => x.id === id);
+    const name = item ? item.name : "this item";
+
+    const confirm = await showDialog({
+      title: "Confirm File Delete",
+      message: `Are you sure you want to send '${name}' to the Recycle Bin?`,
+      image: icon("recycle-empty"),
+      buttons: ["Yes", "No"]
+    });
+
+    if (confirm !== "Yes") return;
+
+    const el = $(`[data-desktop-app="${id}"]`, icons);
+    if (el) el.remove();
+
+    if (item) {
+      if (item.kind === "folder" && item.vfsPath && VFS[item.vfsPath]) {
+        delete VFS[item.vfsPath];
+      }
+      if (notes[item.name]) {
+        delete notes[item.name];
+      }
+      if (VFS["Recycle Bin"]) VFS["Recycle Bin"].push(item.name);
+      const updated = items.filter(x => x.id !== id);
+      setCustomItems(updated);
+    }
+
+    announce(`'${name}' moved to Recycle Bin.`);
+    savePositions();
+  }
+
+  function renameDesktopItem(id) {
+    const el = $(`[data-desktop-app="${id}"]`, icons);
+    if (!el) return;
+    const span = $("span", el);
+    const currentName = el.dataset.customName || span.textContent.trim();
+    const input = document.createElement("input");
+    input.className = "desktop-rename";
+    input.value = currentName;
+    span.textContent = "";
+    span.append(input);
+    input.focus();
+    input.select();
+
+    const finishRename = () => {
+      const newName = input.value.trim() || currentName;
+      span.textContent = newName;
+      el.dataset.customName = newName;
+      el.setAttribute("aria-label", `${newName}. Double click to open.`);
+
+      const items = getCustomItems();
+      const item = items.find(x => x.id === id);
+      if (item) {
+        const oldName = item.name;
+        const oldVfs = item.vfsPath;
+        item.name = newName;
+        if (item.kind === "folder") {
+          item.vfsPath = `C:\\USERS\\DEGEN98\\${newName}`;
+          if (VFS[oldVfs]) {
+            VFS[item.vfsPath] = VFS[oldVfs];
+            delete VFS[oldVfs];
+          }
+        } else {
+          if (notes[oldName] !== undefined) {
+            notes[newName] = notes[oldName];
+            delete notes[oldName];
+          }
+        }
+        setCustomItems(items);
+      }
+      savePositions();
+    };
+
+    input.onkeydown = e => {
+      if (e.key === "Enter") finishRename();
+      if (e.key === "Escape") { input.value = currentName; finishRename(); }
+    };
+    input.onblur = finishRename;
+  }
+
   function updateDesktopRows() {
     const isMobile = innerWidth <= 600;
     const cols = innerWidth <= 360 ? 2 : innerWidth <= 540 ? 3 : 4;
@@ -198,6 +386,7 @@
     set("iconPositions_v5",p);
   }
   function restorePositions(){
+    renderCustomDesktopItems();
     const isMobile = innerWidth <= 600;
     const allIcons = $$('.desktop-icon', icons);
     if (isMobile) {
@@ -461,6 +650,19 @@
     const x=e.target.closest(".desktop-icon");
     if(x){
       const key=x.dataset.desktopApp;
+      if(x.dataset.custom==="true"){
+        const item=getCustomItems().find(t=>t.id===key);
+        const iconName=item?.kind==="folder"?"folder":item?.kind==="links"?"links":"document";
+        menu([
+          {l:"Open",a:`custom-open:${key}`,icon:iconName},
+          {sep:true},
+          {l:"Delete",a:`custom-delete:${key}`,icon:"recycle-empty"},
+          {l:"Rename",a:`custom-rename:${key}`,icon:"document"},
+          {sep:true},
+          {l:"Properties",a:`custom-props:${key}`,icon:iconName}
+        ],e.clientX,e.clientY);
+        return;
+      }
       if(key==="recycle")menu([{l:"Open",a:"open:recycle",icon:"recycle-full"},{l:"Explore",a:"explore:recycle",icon:"recycle-full"},{sep:true},{l:"Empty Recycle Bin",a:"empty-recycle",icon:"recycle-empty",disabled:false},{sep:true},{l:"Create Shortcut",a:"shortcut",icon:"links"},{l:"Rename",a:`rename:${key}`,icon:"document"},{sep:true},{l:"Properties",a:`props:${key}`,icon:"document"}],e.clientX,e.clientY);
       else if(key==="computer")menu([{l:"Open",a:"open:computer",icon:"my-computer"},{l:"Explore",a:"explore:computer",icon:"my-computer"},{sep:true},{l:"Find...",a:"find",icon:"my-computer"},{sep:true},{l:"Properties",a:"system-properties",icon:"document"}],e.clientX,e.clientY);
       else if(key==="linksmarket")menu([{l:"Open",a:"open:linksmarket",icon:"linksmarket"},{l:"Explore",a:"explore:linksmarket",icon:"linksmarket"},{sep:true},{l:"Create Shortcut",a:"shortcut",icon:"links"},{sep:true},{l:"Properties",a:"props:linksmarket",icon:"linksmarket"}],e.clientX,e.clientY);
@@ -482,12 +684,34 @@
       return;
     }
     const now=Date.now();desktopClicks=[...desktopClicks.filter(t=>now-t<2200),now];const secret=desktopClicks.length>=5;
-    menu([{l:"Arrange Icons",icon:"my-computer",sub:[{l:"By Name",a:"name"},{l:"By Type",a:"type"},{l:"By Size",a:"size"},{l:"Auto Arrange",a:"auto",checked:auto}]},{l:"Refresh",a:"refresh",icon:"my-computer"},{sep:true},{l:"New",icon:"document",sub:[{l:"Folder",a:"new-folder",icon:"my-computer"},{l:"Text Document",a:"new-text",icon:"document"},{l:"LINKS Note",a:"new-links",icon:"links"},{l:"Shortcut",a:"new-shortcut",icon:"links"}]},{sep:true},{l:"Paste",a:"paste",icon:"document",disabled:true},{l:"Paste Shortcut",a:"paste-shortcut",icon:"links",disabled:true},{sep:true},{l:"LINKS Terminal",a:"open:terminal",icon:"terminal"},{l:"Market Control",a:"open:market",icon:"market"},{l:"Contract Address",a:"copy-ca",icon:"links"},...(secret?[{sep:true},{l:"???",icon:"links",sub:[{l:"Wake LINKS",a:"wake-links",icon:"links"}]}]:[]),{sep:true},{l:"Desktop Properties",a:"desktop-properties",icon:"my-computer"}],e.clientX,e.clientY);
+    menu([{l:"Arrange Icons",icon:"my-computer",sub:[{l:"By Name",a:"name"},{l:"By Type",a:"type"},{l:"By Size",a:"size"},{l:"Auto Arrange",a:"auto",checked:auto}]},{l:"Refresh",a:"refresh",icon:"my-computer"},{sep:true},{l:"New",icon:"document",sub:[{l:"Folder",a:"new-folder",icon:"folder"},{l:"Text Document",a:"new-text",icon:"document"},{l:"LINKS Note",a:"new-links",icon:"links"},{l:"Shortcut",a:"new-shortcut",icon:"links"}]},{sep:true},{l:"Paste",a:"paste",icon:"document",disabled:true},{l:"Paste Shortcut",a:"paste-shortcut",icon:"links",disabled:true},{sep:true},{l:"LINKS Terminal",a:"open:terminal",icon:"terminal"},{l:"Market Control",a:"open:market",icon:"market"},{l:"Contract Address",a:"copy-ca",icon:"links"},...(secret?[{sep:true},{l:"???",icon:"links",sub:[{l:"Wake LINKS",a:"wake-links",icon:"links"}]}]:[]),{sep:true},{l:"Desktop Properties",a:"desktop-properties",icon:"my-computer"}],e.clientX,e.clientY);
   },true);
   wm.cascade=function(){let i=0;for(const r of this.windows.values()){r.minimized=false;r.maximized=false;r.element.classList.remove("is-minimized","is-maximized");Object.assign(r.element.style,{left:`${18+i*28}px`,top:`${18+i++*26}px`,width:"620px",height:"430px"})}};
-  wm.tile=function(vertical){const list=[...this.windows.values()].filter(r=>!r.minimized),n=list.length,b=this.layer.getBoundingClientRect();list.forEach((r,i)=>{r.maximized=false;r.element.classList.remove("is-maximized");Object.assign(r.element.style,vertical?{left:`${i*b.width/n}px`,top:"0",width:`${b.width/n}px`,height:`${b.height}px`}:{left:"0",top:`${i*b.height/n}px`,width:`${b.width}px`,height:`${b.height/n}px`})})};
+  wm.tile=function(vertical){const list=[...this.windows.values()].filter(r=>!r.minimized),n=list.length,b=this.layer.getBoundingClientRect();list.forEach((r,i)=>{r.maximized=false;r.element.classList.remove("is-maximized");Object.assign(r.element.style,vertical?{left:`${i*b.width/n}px`,top:"0",width:`${b.width/n}px`,height:`${b.height}px`}:{left:"0",top:`${i*b.height/n}px`,width:`${b.width}px`,height:`${b.height}px`})})};
   wm.minimizeAll=function(){[...this.windows.keys()].forEach(k=>this.minimize(k))};
-  function createDesktopItem(kind){const id=`temp-${Date.now()}`,defaults={folder:"New Folder",text:"New Text Document.txt",links:"New LINKS Note.lnk",shortcut:"New Shortcut.lnk"},names={folder:"my-computer",text:"document",links:"links",shortcut:"links"};const el=document.createElement("button");el.className="desktop-icon is-selected";el.dataset.desktopApp=id;el.dataset.tempKind=kind;el.dataset.free="true";el.style.left="110px";el.style.top="110px";el.innerHTML=`<img src="${icon(names[kind])}" alt=""><span><input class="desktop-rename" value="${defaults[kind]}"></span>`;icons.append(el);clearSelection();select(el);const input=$("input",el);input.focus();input.select();const finish=()=>{const name=input.value.trim()||defaults[kind];input.parentElement.textContent=name;el.dataset.tempName=name;savePositions()};input.onkeydown=e=>{if(e.key==="Enter")finish();if(e.key==="Escape"){input.value=defaults[kind];finish()}};input.onblur=finish}
+  function createDesktopItem(kind){
+    const id=`custom-${Date.now()}`;
+    const defaults={folder:"New Folder",text:"New Text Document.txt",links:"New LINKS Note.lnk",shortcut:"New Shortcut.lnk"};
+    let baseName=defaults[kind]||"New Item";
+    const existing=getCustomItems();
+    let counter=1, name=baseName;
+    while(existing.some(x=>x.name===name)){
+      counter++;
+      if(kind==="folder") name=`New Folder (${counter})`;
+      else if(kind==="text") name=`New Text Document (${counter}).txt`;
+      else if(kind==="links") name=`New LINKS Note (${counter}).lnk`;
+      else name=`New Shortcut (${counter}).lnk`;
+    }
+    const vfsPath=kind==="folder"?`C:\\USERS\\DEGEN98\\${name}`:"";
+    const content=kind==="text"?"":kind==="links"?"LINKS NOTE\nCreated on desktop.":"";
+    const newItem={id,kind,name,vfsPath,content};
+    existing.push(newItem);
+    setCustomItems(existing);
+    syncCustomItemsVFS();
+    renderCustomDesktopItems();
+    restorePositions();
+    setTimeout(()=>{renameDesktopItem(id)},60);
+  }
   function wakeLinks(){let visitor=$("#context-cat-visitor");if(visitor)visitor.remove();visitor=document.createElement("img");visitor.id="context-cat-visitor";visitor.className="context-cat-visitor";visitor.src=cat("stand");visitor.alt="Links Cat";visitor.style.left=`${Math.max(20,Math.random()*(innerWidth-120))}px`;desktop.append(visitor);setTimeout(()=>visitor.src=cat("walk"),1400);setTimeout(()=>visitor.remove(),4300)}
   $("#context-menu").addEventListener("click",async e=>{
     const button=e.target.closest("[data-os]");
@@ -496,6 +720,20 @@
     if(!a)return;
     e.stopImmediatePropagation();
     closeMenus();
+    if(a.startsWith("custom-open:"))openCustomItem(a.split(":")[1]);
+    if(a.startsWith("custom-delete:"))deleteDesktopItem(a.split(":")[1]);
+    if(a.startsWith("custom-rename:"))renameDesktopItem(a.split(":")[1]);
+    if(a.startsWith("custom-props:")){
+      const cid=a.split(":")[1];
+      const item=getCustomItems().find(t=>t.id===cid);
+      if(item){
+        showDialog({
+          title:`${item.name} Properties`,
+          message:`Type: ${item.kind==="folder"?"File Folder":"Text Document"}\nLocation: C:\\USERS\\DEGEN98\\DESKTOP\nSize: ${item.content?item.content.length:0} bytes\nCreated: ${new Date().toLocaleDateString()}`,
+          image:icon(item.kind==="folder"?"folder":"document")
+        });
+      }
+    }
     if(a.startsWith("open:"))wm.open(a.split(":")[1]);
     if(a.startsWith("explore:")){
       const target=a.split(":")[1];
@@ -574,6 +812,7 @@
       },300);
     }
     if(a.startsWith("new-"))createDesktopItem(a.slice(4));
+    if(a.startsWith("new-"))createDesktopItem(a.slice(4));
     if(a==="copy-ca"){
       const ca=O.getContractAddress?.()||O.CONFIG.CONTRACT_ADDRESS||"";
       if(!ca||ca==="COMING_SOON"){
@@ -601,7 +840,28 @@
   window.LINKS_OS_SHOW_MENU = menu;
   let altAt=-1;
   function switcher(){const list=[...wm.windows.values()];if(!list.length)return;altAt=(altAt+1)%list.length;let p=$(".alt-switcher");if(!p){p=document.createElement("div");p.className="alt-switcher";document.body.append(p)}p.dataset.key=list[altAt].key;p.innerHTML=`<strong>${escapeHTML(APPS[list[altAt].key].title)}</strong><div>${list.map((r,i)=>`<span class="${i===altAt?"current":""}"><img src="${APPS[r.key].icon}" alt="">${escapeHTML(APPS[r.key].title)}</span>`).join("")}</div>`}
-  window.addEventListener("keydown",e=>{if(e.altKey&&e.key==="Tab"){e.preventDefault();switcher()}if(e.altKey&&e.key==="F4"){e.preventDefault();const r=[...wm.windows.values()].find(x=>x.element.classList.contains("is-active"));if(r)wm.close(r.key)}if(e.ctrlKey&&e.key==="Escape"){e.preventDefault();O.toggleStartMenu()}if(e.key==="F1"){e.preventDefault();wm.open("help98")}if(e.key==="F5"){e.preventDefault();icons.classList.add("refreshing");setTimeout(()=>icons.classList.remove("refreshing"),120)}if(e.ctrlKey&&e.shiftKey&&e.key==="Escape"){e.preventDefault();wm.open("taskmgr")}},true);
+  window.addEventListener("keydown",e=>{
+    const selectedEl = $(".desktop-icon.is-selected", icons);
+    if(selectedEl && selectedEl.dataset.custom === "true"){
+      const cid = selectedEl.dataset.desktopApp;
+      if(e.key === "Delete"){
+        e.preventDefault();
+        deleteDesktopItem(cid);
+        return;
+      }
+      if(e.key === "F2"){
+        e.preventDefault();
+        renameDesktopItem(cid);
+        return;
+      }
+    }
+    if(e.altKey&&e.key==="Tab"){e.preventDefault();switcher()}
+    if(e.altKey&&e.key==="F4"){e.preventDefault();const r=[...wm.windows.values()].find(x=>x.element.classList.contains("is-active"));if(r)wm.close(r.key)}
+    if(e.ctrlKey&&e.key==="Escape"){e.preventDefault();O.toggleStartMenu()}
+    if(e.key==="F1"){e.preventDefault();wm.open("help98")}
+    if(e.key==="F5"){e.preventDefault();icons.classList.add("refreshing");setTimeout(()=>icons.classList.remove("refreshing"),120)}
+    if(e.ctrlKey&&e.shiftKey&&e.key==="Escape"){e.preventDefault();wm.open("taskmgr")}
+  },true);
   window.addEventListener("keyup",e=>{if(e.key==="Alt"){const p=$(".alt-switcher"),k=p?.dataset.key;p?.remove();if(k)wm.focus(k);altAt=-1}});
   const start=$("#start-menu");
   let pet;
@@ -615,5 +875,5 @@
   $("#context-menu").addEventListener("click",e=>{const a=e.target.closest("[data-os]")?.dataset.os;if(a==="toggle-sound")$("#sound-toggle")?.click();if(a==="pet")togglePet();if(a==="catstatus")showDialog({title:"Links Cat Status",message:"Status: ONLINE\nMood: Bullish",image:cat("sit")});if(a==="catsleep"&&$("#desktop-pet"))$("#desktop-pet img").src=cat("sleep-curled");if(a==="catabout")wm.open("about")});
   O.state.sound=get("sound",true);desktop.dataset.wallpaper=get("wallpaper","links-stretch");desktop.style.cursor=get("cursor","default");if(get("pet",true))togglePet();
   const welcome=setInterval(()=>{if($("#boot-screen").hidden){clearInterval(welcome);if(!get("welcomed",false)){showDialog({title:"Welcome to LINKS 98",message:"Tip of the Day:\nDouble-click things.\nThe cat likes that.",image:cat("sit")});set("welcomed",true)}}},300);
-  window.LINKS_OS={openExplorer(p="My Computer"){path=VFS[p]?p:"My Computer";wm.open("computer")},startConfiguredScreensaver:O.startScreensaver,restorePositions,arrange,VFS};
+  window.LINKS_OS={openExplorer(p="My Computer"){path=VFS[p]?p:"My Computer";wm.open("computer")},openCustomItem,deleteDesktopItem,renameDesktopItem,startConfiguredScreensaver:O.startScreensaver,restorePositions,arrange,VFS};
 })();
