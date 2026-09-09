@@ -202,10 +202,33 @@ body[data-power-state="POWERED_OFF"] #desktop { visibility: hidden; }
 .task-button-icon { width: 18px; height: 18px; flex: 0 0 18px; object-fit: contain; image-rendering: pixelated; image-rendering: crisp-edges; }
 .task-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .task-button.is-active { border-style: inset; background-image: repeating-linear-gradient(45deg, var(--color-window) 0 1px, var(--color-paper) 1px 2px); font-weight: 700; }
-.tray { display: flex; align-items: center; min-width: max-content; padding: 2px 4px; border: 2px inset var(--color-window); flex-shrink: 0; }
+.tray { display: flex; align-items: center; min-width: max-content; padding: 2px 4px; border: 2px inset var(--color-window); flex-shrink: 0; gap: 2px; }
 .tray-button, .clock { height: 25px; padding: 0 4px; border: 0; background: var(--color-transparent); white-space: nowrap; }
 .tray-button { position: relative; cursor: pointer; touch-action: manipulation; }
 .tray-button::after { content: ""; position: absolute; inset: -4px; }
+.catchat-tray-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+.catchat-tray-flower {
+  font-size: 13px;
+  filter: hue-rotate(90deg) saturate(1.5);
+  display: inline-block;
+  line-height: 1;
+}
+.catchat-tray-dot {
+  position: absolute;
+  right: 1px;
+  bottom: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #00ff00;
+  border: 1px solid #000000;
+  box-shadow: 0 0 2px #00ff00;
+}
 .clock { flex: 0 0 auto; font-variant-numeric: tabular-nums; }
 
 .window-layer { position: absolute; inset: 0 0 var(--taskbar-height, 38px); z-index: 10; pointer-events: none; overflow: hidden; }

@@ -958,7 +958,17 @@
     "note-alpha":"Definitely not alpha.\n\nThe cat knows where the files went. The cat is not telling.",
     "note-whitepaper":"LINKS WHITEPAPER\nVersion 0.98\n\n1. Cat.\n2. Internet.\n3. Meme.\n4. That's basically it."
   };
-  const tray=$(".tray");tray.insertAdjacentHTML("afterbegin",`<button class="tray-button" data-tray="network" title="Network">🖥</button><button class="tray-button" data-tray="cat" title="Links Cat">🐱</button>`);tray.addEventListener("click",e=>{const t=e.target.closest("[data-tray]")?.dataset.tray;if(t==="network")wm.open("network");if(t==="cat")menu([{l:"Pet Links",a:"pet"},{l:"Status",a:"catstatus"},{l:"Sleep",a:"catsleep"},{l:"About",a:"catabout"}],e.clientX,e.clientY-150);if(e.target.closest("#tray-overflow-btn")){menu([{l:O.state.sound?"Mute Sounds":"Enable Sounds",a:"toggle-sound"},{sep:true},{l:"Network: Connected",a:"open:network",icon:"internet"},{l:"Robinhood Chain (4663)",a:"open:wallet",icon:"links"},{l:"Links Cat",icon:"links",sub:[{l:"Pet Links",a:"pet"},{l:"Status",a:"catstatus"},{l:"Sleep",a:"catsleep"},{l:"About",a:"catabout"}]},{sep:true},{l:"Date / Time",a:"open:datetime",icon:"document"}],Math.min(e.clientX,innerWidth-190),innerHeight-200);}});$("#clock").ondblclick=()=>wm.open("datetime");
+  const tray=$(".tray");tray.insertAdjacentHTML("afterbegin",`<button class="tray-button" data-tray="network" title="Network">🖥</button><button class="tray-button" data-tray="cat" title="Links Cat">🐱</button>`);tray.addEventListener("click",e=>{const t=e.target.closest("[data-tray]")?.dataset.tray;if(t==="catchat"||e.target.closest("#catchat-tray-btn"))wm.open("catchat");if(t==="network")wm.open("network");if(t==="cat")menu([{l:"Pet Links",a:"pet"},{l:"Status",a:"catstatus"},{l:"Sleep",a:"catsleep"},{l:"About",a:"catabout"}],e.clientX,e.clientY-150);if(e.target.closest("#tray-overflow-btn")){menu([{l:"CatChat 98 (ICQ)",a:"open:catchat",icon:"community"},{sep:true},{l:O.state.sound?"Mute Sounds":"Enable Sounds",a:"toggle-sound"},{sep:true},{l:"Network: Connected",a:"open:network",icon:"internet"},{l:"Robinhood Chain (4663)",a:"open:wallet",icon:"links"},{l:"Links Cat",icon:"links",sub:[{l:"Pet Links",a:"pet"},{l:"Status",a:"catstatus"},{l:"Sleep",a:"catsleep"},{l:"About",a:"catabout"}]},{sep:true},{l:"Date / Time",a:"open:datetime",icon:"document"}],Math.min(e.clientX,innerWidth-190),innerHeight-200);}});$("#clock").ondblclick=()=>wm.open("datetime");
+  $("#catchat-tray-btn")?.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    menu([
+      { l: "Open CatChat (ICQ)", a: "open:catchat", icon: "community" },
+      { sep: true },
+      { l: "Status: Online (Links Cat)", a: "open:catchat", icon: "links" },
+      { l: "Send Alpha Query", a: "open:catchat", icon: "terminal" }
+    ], Math.min(e.clientX, innerWidth - 190), innerHeight - 160);
+  });
   $("#context-menu").addEventListener("click",e=>{const a=e.target.closest("[data-os]")?.dataset.os;if(a==="toggle-sound")$("#sound-toggle")?.click();if(a==="pet")togglePet();if(a==="catstatus")showDialog({title:"Links Cat Status",message:"Status: ONLINE\nMood: Bullish",image:cat("sit")});if(a==="catsleep"&&$("#desktop-pet"))$("#desktop-pet img").src=cat("sleep-curled");if(a==="catabout")wm.open("about")});
   O.state.sound=get("sound",true);desktop.dataset.wallpaper=get("wallpaper","links-stretch");desktop.style.cursor=get("cursor","default");if(get("pet",true))togglePet();
   const welcome=setInterval(()=>{if($("#boot-screen").hidden){clearInterval(welcome);if(!get("welcomed",false)){showDialog({title:"Welcome to LINKS 98",message:"Tip of the Day:\nDouble-click things.\nThe cat likes that.",image:cat("sit")});set("welcomed",true)}}},300);
