@@ -39,6 +39,8 @@
     folder: "assets/icons/folder.png",
     rugsweeper: "assets/icons/links98/rugsweeper.png",
     winamp: "assets/icons/links98/winamp.png",
+    catchat: "assets/icons/links98/catchat.png",
+    "cat-pet": "assets/icons/links98/cat-pet.png",
   });
 
   const appIconRegistry = Object.freeze({
@@ -55,6 +57,9 @@
     rugsweeper: iconRegistry.rugsweeper,
     winamp: iconRegistry.winamp,
     media: iconRegistry.winamp,
+    catchat: iconRegistry.catchat,
+    icq: iconRegistry.catchat,
+    pet: iconRegistry["cat-pet"],
   });
 
   const dialogAssets = Object.freeze({

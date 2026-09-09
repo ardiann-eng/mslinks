@@ -2514,7 +2514,7 @@ Please clear the cat before continuing print jobs.
   // =========================================================================
   APPS.catchat = {
     title: "CatChat 98 (ICQ Protocol)",
-    icon: icon("community"),
+    icon: appIcon("catchat", icon("catchat")),
     width: 620,
     height: 450,
     menu: false,
