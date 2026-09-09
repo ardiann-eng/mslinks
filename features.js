@@ -2334,7 +2334,7 @@ Please clear the cat before continuing print jobs.
 
       function setVolume(val) {
         if (masterGain && audioCtx) {
-          masterGain.gain.setValueAtTime((val / 100) * 0.08, audioCtx.currentTime);
+          masterGain.gain.setValueAtTime((val / 100) * 0.28, audioCtx.currentTime);
         }
       }
 
@@ -2379,7 +2379,7 @@ Please clear the cat before continuing print jobs.
         const g1 = audioCtx.createGain();
         osc1.type = "square";
         osc1.frequency.setValueAtTime(freq, t);
-        g1.gain.setValueAtTime(0.04, t);
+        g1.gain.setValueAtTime(0.09, t);
         g1.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc1.connect(g1).connect(masterGain);
         osc1.start(t);
@@ -2390,7 +2390,7 @@ Please clear the cat before continuing print jobs.
         const g2 = audioCtx.createGain();
         osc2.type = "triangle";
         osc2.frequency.setValueAtTime(bassFreq, t);
-        g2.gain.setValueAtTime(0.06, t);
+        g2.gain.setValueAtTime(0.14, t);
         g2.gain.exponentialRampToValueAtTime(0.001, t + dur * 1.2);
         osc2.connect(g2).connect(masterGain);
         osc2.start(t);
@@ -2508,5 +2508,164 @@ Please clear the cat before continuing print jobs.
     }
   };
   APPS.media = APPS.winamp;
+
+  // =========================================================================
+  // FEATURE 9: CATCHAT 98 (ICQ 98 / Retro Crypto Messenger)
+  // =========================================================================
+  APPS.catchat = {
+    title: "CatChat 98 (ICQ Protocol)",
+    icon: icon("community"),
+    width: 620,
+    height: 450,
+    menu: false,
+    render: () => {
+      return `
+        <div class="catchat-container" data-catchat-root>
+          <div class="catchat-sidebar">
+            <div class="catchat-sidebar-title">ONLINE CONTACTS (4)</div>
+            <button class="catchat-contact-item is-active" type="button" data-contact="cat">
+              <span class="catchat-status-dot"></span>
+              <span><strong>Links Cat</strong> (Admin)</span>
+            </button>
+            <button class="catchat-contact-item" type="button" data-contact="degen">
+              <span class="catchat-status-dot"></span>
+              <span>Degen_98 (Trader)</span>
+            </button>
+            <button class="catchat-contact-item" type="button" data-contact="whale">
+              <span class="catchat-status-dot"></span>
+              <span>HodlWhale (Diamond)</span>
+            </button>
+            <button class="catchat-contact-item" type="button" data-contact="mod">
+              <span class="catchat-status-dot" style="background:#ffaa00;box-shadow:0 0 2px #ffaa00;"></span>
+              <span>ModCat (Sleeping)</span>
+            </button>
+          </div>
+
+          <div class="catchat-main-area">
+            <div class="catchat-header-bar">
+              <span>Chatting with: <strong data-catchat-target>Links Cat 🐱</strong></span>
+              <span style="font-size:10px; opacity:0.85;">ICQ #19984663</span>
+            </div>
+
+            <div class="catchat-msg-stream" data-catchat-stream>
+              <div class="catchat-bubble is-cat">
+                <span class="catchat-bubble-author">Links Cat 🐱</span>
+                <span>Welcome to CatChat 98. I have administrator privileges and I do not recommend selling.</span>
+                <span class="catchat-bubble-time">19:98</span>
+              </div>
+            </div>
+
+            <div class="catchat-input-bar">
+              <button class="win-button catchat-quick-btn" type="button" data-chat-quick="alpha">Alpha?</button>
+              <button class="win-button catchat-quick-btn" type="button" data-chat-quick="price">Price?</button>
+              <button class="win-button catchat-quick-btn" type="button" data-chat-quick="gm">gm</button>
+              <input class="catchat-input" data-chat-input placeholder="Type a message to Links Cat..." autocomplete="off">
+              <button class="win-button" type="button" data-chat-send style="font-weight:700;">Send</button>
+            </div>
+          </div>
+        </div>
+      `;
+    },
+    mount: (windowElement) => {
+      const stream = $("[data-catchat-stream]", windowElement);
+      const input = $("[data-chat-input]", windowElement);
+      const targetLabel = $("[data-catchat-target]", windowElement);
+
+      function playUhOh() {
+        if (!O.state.sound) return;
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          const ctx = new Ctx();
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc1.type = "sine";
+          osc2.type = "sine";
+          osc1.frequency.setValueAtTime(440, ctx.currentTime);
+          osc1.frequency.setValueAtTime(330, ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+          osc1.connect(gain).connect(ctx.destination);
+          osc1.start(ctx.currentTime);
+          osc1.stop(ctx.currentTime + 0.36);
+          setTimeout(() => ctx.close(), 400);
+        } catch (_) {}
+      }
+
+      function appendMessage(author, text, isMe = false) {
+        const bubble = document.createElement("div");
+        bubble.className = `catchat-bubble ${isMe ? "is-me" : "is-cat"}`;
+        const time = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date());
+        bubble.innerHTML = `
+          <span class="catchat-bubble-author">${escapeHTML(author)}</span>
+          <span>${escapeHTML(text)}</span>
+          <span class="catchat-bubble-time">${time}</span>
+        `;
+        stream.append(bubble);
+        stream.scrollTop = stream.scrollHeight;
+        playUhOh();
+      }
+
+      function getCatReply(query) {
+        const q = query.toLowerCase();
+        if (q.includes("alpha") || q.includes("secret")) return "The alpha is simple: cat is operating system. Sell button was deleted in 1998.";
+        if (q.includes("price") || q.includes("chart") || q.includes("target")) return "Target: HIGHER. The chart is cat-shaped.";
+        if (q.includes("gm") || q.includes("hello") || q.includes("hi")) return "gm degen. Ready for another day of holding?";
+        if (q.includes("sell") || q.includes("dump") || q.includes("exit")) return "ERROR: SELL.EXE missing from kernel. Recommendation: HODL.";
+        if (q.includes("buy") || q.includes("ca") || q.includes("contract")) return "Robinhood Chain verified. Only trust official links on links.cat.";
+        if (q.includes("meow")) return "meow meow meow! 🐾";
+        if (q.includes("moon")) return "Moon coordinate: locked. ETA: sooner than you think.";
+        if (q.includes("who")) return "I am LINKS CAT. I live in your desktop and supervise your transactions.";
+        const generic = [
+          "Interesting thesis. I will consider it while napping.",
+          "I have reviewed the mempool. Very bullish.",
+          "Hold tight. 1998 technology is powering 2026 internet money.",
+          "Meow. Everything is under control.",
+          "Checked the chart. Still going higher."
+        ];
+        return generic[Math.floor(Math.random() * generic.length)];
+      }
+
+      function sendUserMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = "";
+        appendMessage(O.state.user.username || "degen98", text, true);
+
+        setTimeout(() => {
+          if (windowElement.isConnected) {
+            const reply = getCatReply(text);
+            appendMessage("Links Cat 🐱", reply, false);
+          }
+        }, 500);
+      }
+
+      windowElement.addEventListener("click", (e) => {
+        if (e.target.closest("[data-chat-send]")) sendUserMessage();
+        const quick = e.target.closest("[data-chat-quick]")?.dataset.chatQuick;
+        if (quick) {
+          if (quick === "alpha") input.value = "What is the alpha?";
+          if (quick === "price") input.value = "How is the chart looking?";
+          if (quick === "gm") input.value = "gm Links Cat!";
+          sendUserMessage();
+        }
+        const contact = e.target.closest("[data-contact]");
+        if (contact) {
+          $$(".catchat-contact-item", windowElement).forEach(c => c.classList.remove("is-active"));
+          contact.classList.add("is-active");
+          const name = contact.querySelector("span:last-child")?.textContent || "Contact";
+          if (targetLabel) targetLabel.textContent = name;
+        }
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendUserMessage();
+      });
+
+      input.focus();
+    }
+  };
+  APPS.icq = APPS.catchat;
+  APPS.chat = APPS.catchat;
 
 })();

@@ -25,7 +25,150 @@
   APPS.mail={title:"LINKS Mail",icon:icon("community"),width:680,height:460,status:"Working Offline",render:()=>`<div class="mail-shell"><div>${[["system@links98","Welcome to the Internet","Welcome."],["cat@localhost","stop clicking sell.exe","please."],["moon@internet","RE: connection request","still processing."]].map((m,i)=>`<button data-mail="${i}"><strong>${m[1]}</strong><small>From: ${m[0]}</small></button>`).join("")}</div><article data-message><h2>LINKS Mail</h2><p>Select a message.</p></article></div>`,mount:win=>win.onclick=e=>{const i=e.target.closest("[data-mail]")?.dataset.mail;if(i==null)return;const data=[["Welcome to the Internet","Welcome."],["stop clicking sell.exe","please."],["RE: connection request","still processing."]][i];$("[data-message]",win).innerHTML=`<h2>${data[0]}</h2><p>${data[1]}</p>`}};
 
   // APPS.internet is owned by app.js. Do not replace the full browser runtime here.
-  APPS.recycle={title:"Recycle Bin — Crypto Edition",icon:icon("recycle-full"),width:680,height:470,status:"6 deleted emotional decisions",render:()=>`<div class="file-grid">${["SELL.EXE","PAPERHANDS.DLL","FUD.TXT","PANIC.EXE","BAD_ENTRY.BMP","JEET.EXE"].map(n=>`<button class="file-item" data-trash="${n}"><img src="${icon("document")}" alt=""><span>${n}</span></button>`).join("")}</div>`,mount:win=>{const handleTrash=e=>{const n=e.target.closest("[data-trash]")?.dataset.trash;if(!n)return;if(n==="SELL.EXE"){unlock("DIAMOND PAWS");showDialog({title:"Warning",message:"Restoring SELL.EXE may negatively affect system morale.\n\nSELL.EXE cannot be restored.\nReason: LINKS CAT is sitting on it.",image:cat("warning-cat")})}else showDialog({title:n,message:"This deleted file is safer in quarantine.",image:cat("reactions/confident")})};win.ondblclick=handleTrash;win.onclick=e=>{if(window.innerWidth<=600)handleTrash(e)};win.oncontextmenu=e=>{const n=e.target.closest("[data-trash]")?.dataset.trash;if(!n)return;e.preventDefault();showDialog({title:`${n} Properties`,message:"Location: Recycle Bin\nStatus: Deleted for a reason\nOwner: CAT.EXE",image:icon("document")})}}};
+  APPS.recycle={title:"Recycle Bin",icon:icon("recycle-full"),width:680,height:470,status:"Recycle Bin",render:()=>{
+    const customTrash = JSON.parse(localStorage.getItem("links98:recycled_items") || "[]");
+    const defaultTrash = ["SELL.EXE","PAPERHANDS.DLL","FUD.TXT","PANIC.EXE","BAD_ENTRY.BMP","JEET.EXE"];
+    const count = defaultTrash.length + customTrash.length;
+    return `
+      <div class="explorer-toolbar">
+        <button class="win-button" data-trash-action="empty">Empty Recycle Bin</button>
+        <button class="win-button" data-trash-action="restore-all">Restore All Items</button>
+      </div>
+      <div class="file-grid" data-trash-grid>
+        ${defaultTrash.map(n=>`<button class="file-item" data-trash="${n}"><img src="${icon("document")}" alt=""><span>${n}</span></button>`).join("")}
+        ${customTrash.map(it=>`<button class="file-item" data-custom-trash-id="${it.id}"><img src="${icon(it.kind==="folder"?"folder":"document")}" alt=""><span>${escapeHTML(it.name)}</span></button>`).join("")}
+      </div>
+      <div class="statusbar">${count} object(s) in Recycle Bin</div>
+    `;
+  },mount:win=>{
+    const redraw=()=>{
+      const customTrash = JSON.parse(localStorage.getItem("links98:recycled_items") || "[]");
+      const defaultTrash = ["SELL.EXE","PAPERHANDS.DLL","FUD.TXT","PANIC.EXE","BAD_ENTRY.BMP","JEET.EXE"];
+      const grid = $("[data-trash-grid]", win);
+      if (grid) {
+        grid.innerHTML = defaultTrash.map(n => `<button class="file-item" data-trash="${n}"><img src="${icon("document")}" alt=""><span>${n}</span></button>`).join("") +
+          customTrash.map(it => `<button class="file-item" data-custom-trash-id="${it.id}"><img src="${icon(it.kind === "folder" ? "folder" : "document")}" alt=""><span>${escapeHTML(it.name)}</span></button>`).join("");
+      }
+      const bar = $(".statusbar", win);
+      if (bar) bar.textContent = `${defaultTrash.length + customTrash.length} object(s) in Recycle Bin`;
+    };
+
+    const restoreItem = (id) => {
+      let recycled = JSON.parse(localStorage.getItem("links98:recycled_items") || "[]");
+      const target = recycled.find(t => t.id === id);
+      if (!target) return;
+      recycled = recycled.filter(t => t.id !== id);
+      localStorage.setItem("links98:recycled_items", JSON.stringify(recycled));
+
+      const desktopItems = JSON.parse(localStorage.getItem("links98:custom_desktop_items_v2") || "[]");
+      desktopItems.push(target);
+      localStorage.setItem("links98:custom_desktop_items_v2", JSON.stringify(desktopItems));
+
+      if (window.LINKS_OS?.restorePositions) window.LINKS_OS.restorePositions();
+      announce(`Restored '${target.name}' to Desktop.`);
+      redraw();
+    };
+
+    win.addEventListener("click", async e => {
+      if (e.target.closest("[data-trash-action='empty']")) {
+        const res = await showDialog({
+          title: "Confirm Empty Recycle Bin",
+          message: "Are you sure you want to permanently delete all items in the Recycle Bin?",
+          image: icon("recycle-empty"),
+          buttons: ["Yes", "No"]
+        });
+        if (res === "Yes") {
+          localStorage.setItem("links98:recycled_items", "[]");
+          announce("Recycle Bin emptied.");
+          redraw();
+          showDialog({
+            title: "Recycle Bin",
+            message: "User files deleted.\nSELL.EXE could not be destroyed (protected by cat).",
+            image: cat("reactions/confident")
+          });
+        }
+        return;
+      }
+
+      if (e.target.closest("[data-trash-action='restore-all']")) {
+        let recycled = JSON.parse(localStorage.getItem("links98:recycled_items") || "[]");
+        if (!recycled.length) {
+          showDialog({ title: "Recycle Bin", message: "No user files to restore.", image: icon("recycle-empty") });
+          return;
+        }
+        const desktopItems = JSON.parse(localStorage.getItem("links98:custom_desktop_items_v2") || "[]");
+        recycled.forEach(it => desktopItems.push(it));
+        localStorage.setItem("links98:custom_desktop_items_v2", JSON.stringify(desktopItems));
+        localStorage.setItem("links98:recycled_items", "[]");
+        if (window.LINKS_OS?.restorePositions) window.LINKS_OS.restorePositions();
+        announce("All items restored to Desktop.");
+        redraw();
+        return;
+      }
+
+      const customTrashEl = e.target.closest("[data-custom-trash-id]");
+      if (customTrashEl && window.innerWidth <= 600) {
+        const id = customTrashEl.dataset.customTrashId;
+        const choice = await showDialog({
+          title: "Recycle Bin Item",
+          message: "What would you like to do with this item?",
+          image: icon("recycle-empty"),
+          buttons: ["Restore", "Cancel"]
+        });
+        if (choice === "Restore") restoreItem(id);
+        return;
+      }
+
+      const n = e.target.closest("[data-trash]")?.dataset.trash;
+      if (n && window.innerWidth <= 600) {
+        if (n === "SELL.EXE") {
+          triggerCrash();
+        } else {
+          showDialog({ title: n, message: "This deleted file is safer in quarantine.", image: cat("reactions/confident") });
+        }
+      }
+    });
+
+    win.addEventListener("dblclick", e => {
+      const customTrashEl = e.target.closest("[data-custom-trash-id]");
+      if (customTrashEl) {
+        restoreItem(customTrashEl.dataset.customTrashId);
+        return;
+      }
+      const n = e.target.closest("[data-trash]")?.dataset.trash;
+      if (n) {
+        if (n === "SELL.EXE") {
+          triggerCrash();
+        } else {
+          showDialog({ title: n, message: "This deleted file is safer in quarantine.", image: cat("reactions/confident") });
+        }
+      }
+    });
+
+    win.addEventListener("contextmenu", e => {
+      const customTrashEl = e.target.closest("[data-custom-trash-id]");
+      if (customTrashEl) {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = customTrashEl.dataset.customTrashId;
+        if (window.LINKS_OS_SHOW_MENU) {
+          window.LINKS_OS_SHOW_MENU([
+            { l: "Restore", a: `trash-restore:${id}`, icon: "recycle-empty" },
+            { sep: true },
+            { l: "Delete Permanently", a: `trash-perm-delete:${id}`, icon: "recycle-empty" },
+            { sep: true },
+            { l: "Properties", a: `trash-props:${id}`, icon: "document" }
+          ], e.clientX, e.clientY);
+        }
+        return;
+      }
+      const n = e.target.closest("[data-trash]")?.dataset.trash;
+      if (n) {
+        e.preventDefault();
+        showDialog({ title: `${n} Properties`, message: "Location: Recycle Bin\nStatus: Deleted for a reason\nOwner: CAT.EXE", image: icon("document") });
+      }
+    });
+  }};
   const commands={help:"Commands: help links ca copyca buy chart price status wallet holders moon bullish sell jeet fud rug gm gn meow whoami ping internet history\nHidden commands may exist.",links:"LINKS CAT INTERNET PROTOCOL\nSTATUS: RUNNING",ca:`Contract Address:\n${X.CONTRACT_ADDRESS}`,status:"LINKS.EXE       RUNNING\nMEMES.DLL       RUNNING\nINTERNET        CONNECTED\nROBINHOOD.SYS   ONLINE\nSELL.EXE        NOT FOUND",holders:"NOT CONNECTED\nNo holder count is being fabricated.",moon:"Pinging moon...\n\nReply from moon:\ndistance=HIGHER\nstatus=SOON™",bullish:"Bullish mode already enabled.",sell:"ERROR 404:\nSELL BUTTON NOT FOUND",jeet:"Access denied.",fud:"Deleting FUD...\n████████████ 100%\nComplete.",rug:"RUG.DLL not installed.",gm:"gm.",gn:"Links does not sleep.\nExcept when he does.",meow:"meow.",whoami:"internet_user",ping:"Reply from internet: bytes=cats time=56k TTL=98",internet:"THE INTERNET is connected. Somehow.","sudo links":"LINKS already has administrator privileges.","sudo sell":"Permission denied by: LINKS.EXE"};
   APPS.terminal={title:"LINKS Terminal",icon:icon("terminal"),width:670,height:450,menu:false,render:()=>`<div class="terminal"><pre class="terminal-output">LINKS CAT TERMINAL\nCrypto System Expansion loaded.\n\n</pre><label class="terminal-line"><span>C:\\&gt;&nbsp;</span><input class="terminal-input" autocomplete="off" spellcheck="false"></label></div>`,mount:win=>{const i=$("input",win),o=$("pre",win),history=[];i.onkeydown=e=>{if(e.key!=="Enter")return;const raw=i.value.trim(),cmd=raw.toLowerCase();history.push(raw);o.textContent+=`C:\\> ${raw}\n`;i.value="";if(cmd==="clear")o.textContent="";else if(cmd==="copyca"){copyCA();o.textContent+="Contract Address copied to clipboard.\n\n"}else if(cmd==="buy"){o.textContent+="Opening LINKS acquisition protocol...\n\n";safeOpen(X.BUY_URL,"Official buy URL")}else if(cmd==="chart"){o.textContent+="Opening configured chart...\n\n";safeOpen(X.CHART_URL,"Chart URL")}else if(cmd==="wallet")wm.open("wallet");else if(cmd==="price")wm.open("price");else if(cmd==="internet")wm.open("internet");else if(cmd==="history")o.textContent+=history.join("\n")+"\n\n";else if(cmd==="sudo links"){unlock("SYSTEM ADMIN");o.textContent+=commands[cmd]+"\n\n"}else if(cmd==="sudo remove links")o.textContent+="CRITICAL SYSTEM WARNING\nRemoving LINKS.EXE will remove:\nInternet\nMemes\nDesktop\nMouse\nHope\n\nACCESS DENIED. Nice try.\n\n";else o.textContent+=(commands[cmd]||`'${raw}' is not recognized.`)+"\n\n";$(".terminal",win).scrollTop=99999};i.focus()}};
 

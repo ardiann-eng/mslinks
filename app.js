@@ -2221,9 +2221,9 @@
     linksonline: {
       title: "LINKS Online", icon: appIcon("linksonline"), width: 560, height: 380, menu: true, status: "Connected to LINKS Online services.",
       render: () => renderProgramGroup("C:\\LINKS\\ONLINE", [
+        { key: "catchat", label: "CatChat (ICQ)", icon: icon("community"), tip: "Connect to live retro crypto chat with Links Cat" },
         { key: "community", label: "Community", icon: icon("community"), tip: "Connect with the LINKS Cat global community" },
         { key: "memes", label: "Memes", icon: icon("memes"), tip: "Browse authentic LINKS meme library" },
-        { key: "internet", label: "LINKS Home", icon: icon("internet"), tip: "Open LINKS Internet Explorer official home page" },
         { key: "mememaker", label: "Meme Maker", icon: icon("memes"), tip: "Create and customize custom LINKS 98 memes" }
       ], "Connected to LINKS Online services."),
       mount: (win) => mountProgramGroup(win, "Connected to LINKS Online services.")
@@ -2716,7 +2716,8 @@
         rugsweeper: "rugsweeper", minesweeper: "rugsweeper", sweep: "rugsweeper",
         winamp: "winamp", media: "winamp", music: "winamp", catamp: "winamp", player: "winamp",
         taskmgr: "taskmgr", taskmanager: "taskmgr", tasks: "taskmgr",
-        weather: "weather", forecast: "weather"
+        weather: "weather", forecast: "weather",
+        catchat: "catchat", icq: "catchat", chat: "catchat", msg: "catchat"
       };
       finish();
       if (aliases[command]) wm.open(aliases[command]);

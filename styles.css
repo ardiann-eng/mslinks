@@ -2224,6 +2224,139 @@ body[data-scheme="bull-market"] .window.is-active .titlebar { background: var(--
 }
 
 /* ==========================================================================
+   FEATURE: CATCHAT (ICQ 98 / Retro Crypto Messenger)
+   ========================================================================== */
+.catchat-container {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  height: 100%;
+  background: var(--color-window);
+  user-select: none;
+  font-family: var(--font-system);
+}
+.catchat-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-window);
+  border-right: 2px solid var(--color-window-mid);
+  padding: 4px;
+  gap: 3px;
+  overflow-y: auto;
+}
+.catchat-sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 4px;
+  color: var(--color-window-dark);
+  border-bottom: 1px solid var(--color-window-mid);
+}
+.catchat-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 11px;
+  border-radius: 0;
+}
+.catchat-contact-item:hover {
+  background: rgba(0, 0, 128, 0.08);
+}
+.catchat-contact-item.is-active {
+  background: #000080;
+  color: #ffffff;
+}
+.catchat-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00ff00;
+  box-shadow: 0 0 2px #00ff00;
+  flex-shrink: 0;
+}
+.catchat-main-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+}
+.catchat-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: #000080;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+}
+.catchat-msg-stream {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fffff8;
+}
+.catchat-bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  padding: 4px 8px;
+  border: 1px solid #c0c0c0;
+  background: #f0f0f0;
+  font-size: 12px;
+  line-height: 1.35;
+  user-select: text;
+}
+.catchat-bubble.is-me {
+  align-self: flex-end;
+  background: #e1f5fe;
+  border-color: #81d4fa;
+}
+.catchat-bubble.is-cat {
+  align-self: flex-start;
+  background: #fff9c4;
+  border-color: #fff176;
+}
+.catchat-bubble-author {
+  font-size: 10px;
+  font-weight: 700;
+  color: #555555;
+  margin-bottom: 2px;
+}
+.catchat-bubble-time {
+  font-size: 9px;
+  color: #888888;
+  align-self: flex-end;
+  margin-top: 2px;
+}
+.catchat-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--color-window);
+  border-top: 1px solid var(--color-window-mid);
+}
+.catchat-input {
+  flex: 1;
+  padding: 3px 6px;
+  border: 2px inset var(--color-window);
+  background: #ffffff;
+  font-family: var(--font-system);
+  font-size: 12px;
+}
+.catchat-quick-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+}
+
+/* ==========================================================================
    FEATURE 6: INTERNET WEATHER
    ========================================================================== */
 .weather-container {
