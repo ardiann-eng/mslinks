@@ -39,11 +39,28 @@
     "origin.txt": "Nobody installed Links.\n\nOne morning he was simply here.\n\nSystem logs indicate LINKS.EXE existed before LINKS 98 finished installing.\n\nCreated: UNKNOWN\nOwner: UNKNOWN\nLast modified: Tomorrow",
     "lore.txt": "In 1998, LINKS.exe appeared on a computer nobody remembered installing it on."
   };
-  const file = name => `<button class="file-item" data-vfs="${escapeHTML(name)}"><img src="${icon(/internet/i.test(name)?"internet":/meme/i.test(name)?"memes":/moon/i.test(name)?"moon":name.includes(".")?"document":"my-computer")}" alt=""><span>${escapeHTML(name)}</span></button>`;
+  const memeFiles = VFS["C:\\MEMES"];
+  const memeAssets = [
+    "memes (1).jpg", "memes (5).jpg", "memes (6).jpg", "memes (7).jpg",
+    "memes (19).jpg", "memes (20).jpg", "memes (21).jpg", "memes (22).jpg",
+    "memes (23).jpg", "memes (24).jpg", "memes (25).jpg", "memes (26).jpg",
+    "memes (27).jpg", "memes (28).jpg", "memes (29).jpg", "memes (30).jpg",
+    "memes (31).jpg", "memes (32).jpg", "memes (33).jpg", "memes (34).jpg",
+    "memes (35).jpg", "memes (36).jpg", "memes (37).jpg", "memes (38).jpg",
+    "memes (39).jpg", "memes (40).jpg", "memes (41).jpg"
+  ];
+  const memeIndexFor = name => memeFiles.indexOf(name);
+  const file = (name, sourcePath = path) => {
+    const memeIndex = sourcePath === "C:\\MEMES" ? memeIndexFor(name) : -1;
+    const image = memeIndex >= 0
+      ? `assets/memes/${memeAssets[memeIndex]}`
+      : icon(/internet/i.test(name)?"internet":/meme/i.test(name)?"memes":/moon/i.test(name)?"moon":name.includes(".")?"document":"my-computer");
+    return `<button class="file-item${memeIndex >= 0 ? " thumbnail" : ""}" data-vfs="${escapeHTML(name)}"><img src="${image}" alt=""><span>${escapeHTML(name)}</span></button>`;
+  };
   let path = "My Computer", history = [path], historyAt = 0;
   const mappedApp = name => ({"internet drive (l:)":"internet","memes (m:)":"memes","moon drive (x:)":"moon","links.exe":"links","links98_setup.exe":"setup","setup.exe":"setup","calculator":"calculator","paint":"paint","notepad":"notepad","links printer":"printer","printer":"printer","links solitaire":"solitaire","solitaire":"solitaire","rugsweeper":"rugsweeper","rugsweeper.exe":"rugsweeper","minesweeper":"rugsweeper","winamp":"winamp","winamp.exe":"winamp","media":"winamp","links media player":"winamp","catchat":"catchat","icq":"catchat","chat":"catchat","links antivirus":"antivirus","antivirus":"antivirus","live tape":"livetape","holder map":"holdermap","internet weather":"weather"})[name.toLowerCase()];
   const nextPath = name => name.includes("(A:)")?"A:\\":name.includes("(C:)")?"C:\\":path.endsWith("\\")?path+name:`${path}\\${name}`;
-  function drawExplorer(win) { const list=VFS[path]||[]; $("[data-address]",win).value=path; $("[data-files]",win).innerHTML=list.map(file).join(""); $("[data-count]",win).textContent=`${list.length} object(s)`; $$('[data-tree]',win).forEach(x=>x.classList.toggle("is-current",x.dataset.tree===path)); }
+  function drawExplorer(win) { const list=VFS[path]||[]; $("[data-address]",win).value=path; $("[data-files]",win).innerHTML=list.map(name=>file(name,path)).join(""); $("[data-count]",win).textContent=`${list.length} object(s)`; $$('[data-tree]',win).forEach(x=>x.classList.toggle("is-current",x.dataset.tree===path)); }
   function go(to, win, push=true) { if(!VFS[to]) return; path=to; if(push){ history=history.slice(0,historyAt+1); history.push(to); historyAt++; } drawExplorer(win); }
   function openItem(name, win) {
     if(name==="DO_NOT_OPEN") return password(win);
@@ -51,6 +68,15 @@
     if(name==="Memes (M:)") return wm.open("memes"); if(name==="Moon Drive (X:)") return wm.open("moon");
     const to=nextPath(name); if(VFS[to]) return go(to,win);
     const ext = name.split(".").pop().toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext)) {
+      const memeIndex = memeIndexFor(name);
+      if (memeIndex >= 0) {
+        O.state.memeIndex = memeIndex;
+        wm.close("viewer");
+        wm.open("viewer");
+        return;
+      }
+    }
     if(["js", "json", "css"].includes(ext)) {
       wm.open("editor");
       const eWin = wm.windows.get("editor");

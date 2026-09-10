@@ -400,7 +400,6 @@ body[data-scheme="bull-market"] .window.is-active .titlebar { background: var(--
   pointer-events: auto;
 }
 .start-entry:hover > .start-flyout-menu,
-.start-entry:focus-within > .start-flyout-menu,
 .start-entry.is-open > .start-flyout-menu {
   display: flex !important;
 }
@@ -685,7 +684,7 @@ body[data-scheme="bull-market"] .window.is-active .titlebar { background: var(--
 
 /* LINKS 98 system-behavior extension; the established visual identity is unchanged. */
 .selection-box{position:absolute;z-index:2;border:1px dotted var(--color-paper);outline:1px dotted var(--color-ink);background:oklch(45% .12 250/24%);pointer-events:none}.desktop-icons.refreshing{opacity:0}
-.explorer-shell{min-height:0;height:calc(100% - 72px);display:grid;grid-template-columns:170px minmax(0,1fr)}.folder-tree{padding:var(--space-xs);overflow:auto;border:2px inset var(--color-window);background:var(--color-paper)}.folder-tree button{width:100%;padding:3px;border:0;background:transparent;text-align:left;white-space:nowrap}.folder-tree button:hover,.folder-tree button.is-current{background:var(--color-select);color:var(--color-paper)}.file-grid.is-list-view{display:flex;flex-direction:column}.file-grid.is-list-view .file-item{min-height:28px;flex-direction:row}.file-grid.is-list-view .file-item img{width:22px;height:22px}
+.window[data-app="computer"] .window-content{display:flex;flex-direction:column;overflow:hidden}.explorer-shell{min-height:0;flex:1;display:grid;grid-template-columns:170px minmax(0,1fr);overflow:hidden}.explorer-shell>.file-grid{min-height:0;overflow:auto;align-content:start}.folder-tree{min-height:0;padding:var(--space-xs);overflow:auto;border:2px inset var(--color-window);background:var(--color-paper)}.folder-tree button{width:100%;padding:3px;border:0;background:transparent;text-align:left;white-space:nowrap}.folder-tree button:hover,.folder-tree button.is-current{background:var(--color-select);color:var(--color-paper)}.file-grid.is-list-view{display:flex;flex-direction:column}.file-grid.is-list-view .file-item{min-height:28px;flex-direction:row}.file-grid.is-list-view .file-item img{width:22px;height:22px}
 .notepad-menu{display:flex;gap:2px;margin:calc(var(--space-md)*-1);margin-bottom:0;padding:2px;border-bottom:1px solid var(--color-window-mid)}.notepad-menu button,.help-shell nav button{padding:4px 7px;border:0;background:transparent;text-align:left}.notepad-menu button:hover,.help-shell nav button:hover{background:var(--color-select);color:var(--color-paper)}.notepad-area{width:calc(100% + 24px);height:calc(100% - 24px);margin:0 -12px -12px;padding:6px;resize:none;border:2px inset var(--color-window);background:var(--color-paper);font:var(--text-md)/1.4 var(--font-mono)}
 .control-grid{display:grid;grid-template-columns:repeat(4,minmax(90px,1fr));gap:var(--space-md);min-height:300px;padding:var(--space-md);border:2px inset var(--color-window);background:var(--color-paper)}.settings-panel{display:grid;gap:var(--space-md)}.settings-panel label{display:flex;align-items:center;gap:var(--space-sm)}.monitor-preview{width:190px;height:125px;margin:auto;display:grid;place-items:center;border:12px outset var(--color-window);background:var(--color-title);color:var(--color-paper)}
 
