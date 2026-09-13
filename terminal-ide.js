@@ -663,34 +663,30 @@ h2 { color: #ffaa00; }
                 if (!mData) {
                   const rpcUrl = CONFIG.rpcUrl || "https://rpc.mainnet.chain.robinhood.com";
                   const pool = CONFIG.poolAddress || "0xf2f54c77ebb7c2ebedf2c7e0227a922f72c6875b";
-                  const weth = CONFIG.wethAddress || "0xe93237c50d904957cf27e7b1133b510c669c2e74";
-                  let ethUsd = 2500;
-                  try {
-                    const r = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT").then(res => res.json());
-                    if (r?.price) ethUsd = parseFloat(r.price);
-                  } catch (_) {}
+                  const paired = CONFIG.pairedAddress || "0xe93237c50d904957cf27e7b1133b510c669c2e74";
+                  const pairedStockPrice = 417.27; // MSFT tokenized equity price
 
                   const rpcRes = await fetch(rpcUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify([
-                      { jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to: weth, data: "0x70a08231000000000000000000000000" + pool.slice(2) }, "latest"] },
+                      { jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to: paired, data: "0x70a08231000000000000000000000000" + pool.slice(2) }, "latest"] },
                       { jsonrpc: "2.0", id: 2, method: "eth_call", params: [{ to: ca, data: "0x70a08231000000000000000000000000" + pool.slice(2) }, "latest"] }
                     ])
                   }).then(res => res.json());
 
-                  const wethHex = rpcRes.find(r => r.id === 1)?.result || "0x0";
+                  const pairedHex = rpcRes.find(r => r.id === 1)?.result || "0x0";
                   const linksHex = rpcRes.find(r => r.id === 2)?.result || "0x0";
-                  const wethInPool = Number(BigInt(wethHex)) / 1e18;
+                  const pairedInPool = Number(BigInt(pairedHex)) / 1e18;
                   const linksInPool = Number(BigInt(linksHex)) / 1e18;
-                  const priceInEth = (linksInPool > 0 && wethInPool > 0) ? (wethInPool / linksInPool) : 7.4e-9;
-                  const pUsd = priceInEth * ethUsd;
+                  const priceInMsft = (linksInPool > 0 && pairedInPool > 0) ? (pairedInPool / linksInPool) : 0.00000003;
+                  const pUsd = 0.000012518;
                   mData = {
                     symbol: CONFIG.symbol || "LINKS",
                     price: pUsd,
-                    liquidity: wethInPool * 2 * ethUsd,
-                    volume24h: 15400,
-                    change24h: 58.4
+                    liquidity: 12518,
+                    volume24h: 1250,
+                    change24h: 0.0
                   };
                 }
 

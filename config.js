@@ -14,10 +14,11 @@ const LINKS_CONFIG = {
   symbol: "LINKS",
   decimals: 18,
 
-  ponsUrl: "https://robinhoodchain.blockscout.com/address/0xf2f54c77ebb7c2ebedf2c7e0227a922f72c6875b",
-  buyUrl: "",
+  ponsUrl: "https://www.ponsfamily.com/launchpad/0xb30c24a564e649ce7dca9f5549b870e8ef4b70d2",
+  buyUrl: "https://www.ponsfamily.com/launchpad/0xb30c24a564e649ce7dca9f5549b870e8ef4b70d2",
   poolAddress: "0xf2f54c77ebb7c2ebedf2c7e0227a922f72c6875b",
-  wethAddress: "0xe93237c50d904957cf27e7b1133b510c669c2e74",
+  pairedAsset: "MSFT",
+  pairedAddress: "0xe93237c50d904957cf27e7b1133b510c669c2e74",
   launchBlock: 61593941,
 
   // Additional settings
