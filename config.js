@@ -14,9 +14,10 @@ const LINKS_CONFIG = {
   symbol: "LINKS",
   decimals: 18,
 
-  ponsUrl: "",
+  ponsUrl: "https://robinhoodchain.blockscout.com/address/0xf2f54c77ebb7c2ebedf2c7e0227a922f72c6875b",
   buyUrl: "",
-  poolAddress: "",
+  poolAddress: "0xf2f54c77ebb7c2ebedf2c7e0227a922f72c6875b",
+  wethAddress: "0xe93237c50d904957cf27e7b1133b510c669c2e74",
   launchBlock: 61593941,
 
   // Additional settings

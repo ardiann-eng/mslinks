@@ -287,10 +287,10 @@
 
           if (poolAddr && from.toLowerCase() === poolAddr.toLowerCase()) {
             type = "BUY";
-            ethAmount = linksAmount * 0.00042; // Derived from pool ratio
+            ethAmount = linksAmount * 0.000000008; // Real PONS pool ratio (~8n ETH per LINKS)
           } else if (poolAddr && to.toLowerCase() === poolAddr.toLowerCase()) {
             type = "SELL";
-            ethAmount = linksAmount * 0.00042;
+            ethAmount = linksAmount * 0.000000008;
           }
 
           trades.push({

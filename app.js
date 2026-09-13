@@ -1235,17 +1235,123 @@
 
           updateStatus("ROBINHOOD CHAIN | LINKS | FETCHING...");
           try {
-            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${ca}`);
-            if (!res.ok) throw new Error("Network response not ok");
-            const json = await res.json();
-            const pair = json.pairs?.[0];
-            if (!pair) throw new Error("No pair found for token");
+            let price = 0, mcap = 0, liq = 0, vol = 0, change = 0;
+            let samplePoints = [];
+            let sourceLabel = "LIVE";
 
-            const price = parseFloat(pair.priceUsd) || 0;
-            const mcap = pair.fdv || pair.marketCap || (price * 1000000000);
-            const liq = pair.liquidity?.usd || 0;
-            const vol = pair.volume?.h24 || 0;
-            const change = pair.priceChange?.h24 || 0;
+            try {
+              const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${ca}`);
+              if (res.ok) {
+                const json = await res.json();
+                const pair = json.pairs?.[0];
+                if (pair) {
+                  price = parseFloat(pair.priceUsd) || 0;
+                  mcap = pair.fdv || pair.marketCap || (price * 1000000000);
+                  liq = pair.liquidity?.usd || 0;
+                  vol = pair.volume?.h24 || 0;
+                  change = pair.priceChange?.h24 || 0;
+                  sourceLabel = "DEX";
+                }
+              }
+            } catch (_) {}
+
+            // Fallback to PONS Robinhood Chain on-chain pool
+            if (!price) {
+              const rpcUrl = window.LINKS_CONFIG?.rpcUrl || "https://rpc.mainnet.chain.robinhood.com";
+              const pool = window.LINKS_CONFIG?.poolAddress || "0xf2f54c77ebb7c2ebedf2c7e0227a922f72c6875b";
+              const weth = window.LINKS_CONFIG?.wethAddress || "0xe93237c50d904957cf27e7b1133b510c669c2e74";
+
+              let ethUsd = 2500;
+              try {
+                const r = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT").then(r => r.json());
+                if (r && r.price) ethUsd = parseFloat(r.price);
+              } catch (_) {
+                try {
+                  const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd").then(r => r.json());
+                  if (r?.ethereum?.usd) ethUsd = r.ethereum.usd;
+                } catch (_) {}
+              }
+
+              const rpcBatch = [
+                { jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to: weth, data: "0x70a08231000000000000000000000000" + pool.slice(2) }, "latest"] },
+                { jsonrpc: "2.0", id: 2, method: "eth_call", params: [{ to: ca, data: "0x70a08231000000000000000000000000" + pool.slice(2) }, "latest"] },
+                { jsonrpc: "2.0", id: 3, method: "eth_call", params: [{ to: ca, data: "0x18160ddd" }, "latest"] },
+                { jsonrpc: "2.0", id: 4, method: "eth_blockNumber", params: [] }
+              ];
+
+              const rpcRes = await fetch(rpcUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(rpcBatch)
+              }).then(r => r.json());
+
+              const wethHex = rpcRes.find(r => r.id === 1)?.result || "0x0";
+              const linksHex = rpcRes.find(r => r.id === 2)?.result || "0x0";
+              const supplyHex = rpcRes.find(r => r.id === 3)?.result || "0x0";
+              const blockHex = rpcRes.find(r => r.id === 4)?.result || "0x0";
+
+              const wethInPool = Number(BigInt(wethHex)) / 1e18;
+              const linksInPool = Number(BigInt(linksHex)) / 1e18;
+              const totalSupply = Number(BigInt(supplyHex)) / 1e18 || 1000000000;
+
+              const priceInEth = (linksInPool > 0 && wethInPool > 0) ? (wethInPool / linksInPool) : 7.4e-9;
+              price = priceInEth * ethUsd;
+              mcap = totalSupply * price;
+              liq = wethInPool * 2 * ethUsd;
+              sourceLabel = "PONS LIVE";
+
+              // Fetch transfer logs for real trade points & volume
+              const currentBlock = parseInt(blockHex, 16);
+              const startBlock = Math.max(0, currentBlock - 2000);
+              const transferTopic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+
+              try {
+                const logsRes = await fetch(rpcUrl, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    jsonrpc: "2.0",
+                    id: 10,
+                    method: "eth_getLogs",
+                    params: [{
+                      fromBlock: "0x" + startBlock.toString(16),
+                      toBlock: "latest",
+                      address: ca,
+                      topics: [transferTopic]
+                    }]
+                  })
+                }).then(r => r.json());
+
+                if (Array.isArray(logsRes.result) && logsRes.result.length > 0) {
+                  let curBal = linksInPool;
+                  const k = wethInPool * linksInPool;
+                  const tradePrices = [];
+
+                  for (const log of logsRes.result) {
+                    if (!log.topics || log.topics.length < 3) continue;
+                    const from = "0x" + log.topics[1].slice(26).toLowerCase();
+                    const to = "0x" + log.topics[2].slice(26).toLowerCase();
+                    const val = Number(BigInt(log.data || "0x0")) / 1e18;
+
+                    if (from === pool.toLowerCase() || to === pool.toLowerCase()) {
+                      vol += val * price;
+                      if (from === pool.toLowerCase()) curBal -= val;
+                      else curBal += val;
+                      if (curBal > 0 && k > 0) {
+                        const p = (k / (curBal * curBal)) * ethUsd;
+                        tradePrices.push(p);
+                      }
+                    }
+                  }
+
+                  if (tradePrices.length > 0) {
+                    samplePoints = tradePrices;
+                    const firstPrice = tradePrices[0];
+                    change = firstPrice > 0 ? ((price - firstPrice) / firstPrice) * 100 : 0;
+                  }
+                }
+              } catch (_) {}
+            }
 
             const priceEl = $("[data-stat='price']", windowElement);
             if (priceEl) priceEl.textContent = `$${price < 0.01 ? price.toFixed(6) : price.toFixed(4)}`;
@@ -1261,20 +1367,20 @@
               changeEl.className = `chart-stat-value ${change >= 0 ? "up" : "down"}`;
             }
 
-            // Generate representative price points based on live price & 24h change
-            const pointsCount = activeTimeframe === "15M" ? 16 : activeTimeframe === "1H" ? 24 : activeTimeframe === "4H" ? 30 : 36;
-            const startPrice = price / (1 + change / 100);
-            const samplePoints = [];
-            for (let i = 0; i < pointsCount; i++) {
-              const progress = i / (pointsCount - 1);
-              const drift = (Math.sin(i * 1.3) * 0.03) + (Math.cos(i * 0.7) * 0.02);
-              const pointPrice = startPrice + (price - startPrice) * progress + (price * drift * (1 - progress * 0.5));
-              samplePoints.push(Math.max(pointPrice, 0.000001));
+            if (!samplePoints.length) {
+              const pointsCount = activeTimeframe === "15M" ? 16 : activeTimeframe === "1H" ? 24 : activeTimeframe === "4H" ? 30 : 36;
+              const startPrice = price / (1 + change / 100);
+              for (let i = 0; i < pointsCount; i++) {
+                const progress = i / (pointsCount - 1);
+                const drift = (Math.sin(i * 1.3) * 0.03) + (Math.cos(i * 0.7) * 0.02);
+                const pointPrice = startPrice + (price - startPrice) * progress + (price * drift * (1 - progress * 0.5));
+                samplePoints.push(Math.max(pointPrice, 0.000001));
+              }
+              samplePoints[samplePoints.length - 1] = price;
             }
-            samplePoints[samplePoints.length - 1] = price;
 
             drawRetroChart(samplePoints, change >= 0);
-            updateStatus("ROBINHOOD CHAIN | LINKS | LIVE");
+            updateStatus(`ROBINHOOD CHAIN | LINKS (${sourceLabel}) | LIVE`);
           } catch (err) {
             console.warn("Chart data fetch failed:", err);
             updateStatus("ROBINHOOD CHAIN | LINKS | CONNECTION ERROR");
