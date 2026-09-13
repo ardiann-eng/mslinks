@@ -10,18 +10,18 @@ const LINKS_CONFIG = {
   rpcUrl: "https://rpc.mainnet.chain.robinhood.com",
   explorerUrl: "https://robinhoodchain.blockscout.com",
 
-  tokenAddress: "",
+  tokenAddress: "0xb30c24a564e649ce7dca9f5549b870e8ef4b70d2",
   symbol: "LINKS",
   decimals: 18,
 
   ponsUrl: "",
   buyUrl: "",
   poolAddress: "",
-  launchBlock: null,
+  launchBlock: 61593941,
 
   // Additional settings
   largeTradeEthThreshold: 0.5,
-  xUrl: "https://x.com"
+  xUrl: "https://x.com/linksrh"
 };
 
 // Expose globally
